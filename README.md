@@ -17,13 +17,13 @@ Open http://localhost:5173. ES modules need a server; opening `index.html` from 
 | What | Where |
 |---|---|
 | Logo | Done. `assets/brand/sloka-logo.png` (640px web copy) and `sloka-logo-original.png` (full size). Only the black JPEG corners outside the pill were made transparent |
-| **Cambridge badge** `cambridge-partner-badge.png` | `assets/brand/cambridge-partner-badge.png` |
+| Cambridge logo | Done. `assets/brand/cambridge-international-school-*.webp` (original kept as PNG), shown unaltered on a white plate in the hero, pathway, curriculum card and footer |
 | Cambridge Fit link | Done: `js/config.js` → `CAMBRIDGE_FIT_URL` (Google Form, used by all 4 compass buttons) |
 | Phone, WhatsApp, email, address, socials | Done, from slokainternational.com/contact-us (Manneguda campus). Edit in `js/config.js` → `SLOKA_SITE` and the JSON-LD block in `index.html` |
-| CRM | `js/config.js` → `SLOKA_ENQUIRY_CONFIG` (see below) |
+| CRM | Done: ExtraaEdge widget (see below) |
 | Canonical URL / schema URLs | `index.html` `<head>` (currently `example.com`) |
 | Google Analytics / Meta Pixel IDs | commented blocks in `index.html` `<head>` |
-| Photos still missing | `swimming`, `art-music`, `students-group`, `principal`, `senior-students` (placeholders in `assets/img/`) |
+| Photos | All in. Only the principal portrait placeholder remains, and it is no longer used |
 | Principal's signature | Done. `assets/brand/principal-signature.png` (ink lifted from the scan). In `index.html`, a wide "pen" path (`.signature__pen`) traces the stroke order as a mask so it signs live. Ink colour is the `flood-color` in `#sigInk` (maroon; use `#1F7A5C` for her original green) |
 | **Drive times on the map** | `js/config.js` → `LOCALITIES[].mins`. These are rough estimates; have the admissions or transport team check and correct them |
 | Privacy policy | `privacy.html` is a placeholder |
@@ -34,17 +34,16 @@ Each photo exists as `name-800.webp` and `name-1600.webp`. To replace one, expor
 
 Currently mapped from the supplied photos: `hero-campus` (building), `sports` (basketball), `debate` (Dealathon), `classroom` (flipped teaching), `early-years` (blocks), `assembly-speaking` (SPIN podcast), `skating-karate` (skating), `steam-lab` (robotics).
 
-## CRM integration
+## Enquiry form (ExtraaEdge CRM widget)
 
-The form is one isolated component: `<section id="enquiry-form">` + `js/enquiry-form.js`, configured only through `window.SLOKA_ENQUIRY_CONFIG` in `js/config.js`:
+The enquiry form is the school's **ExtraaEdge** widget, shown inside the admission-ticket frame in `<section id="enquiry-form">`:
 
-- **Form action URL (no secret):** set `CRM_ENDPOINT` to the URL and `ENCODING: 'form'`.
-- **API with a key:** set `CRM_ENDPOINT: '/api/enquiry'` and deploy `api/enquiry.js` as a serverless function (Vercel/Netlify-style handler). Put `CRM_API_URL`, `CRM_API_KEY` and `ALLOWED_ORIGIN` in the host's environment variables. **Never put the key in front-end code.**
-- **Embed widget:** paste the vendor markup into `EMBED_HTML`; it replaces the form fields inside the ticket.
-- `FIELD_MAP` renames our fields to the CRM's names. `EXTRA_FIELDS` adds constants such as campus and lead source.
-- Hidden fields `utm_source`, `utm_medium`, `utm_campaign` and `page_url` are filled from the URL. UTMs are remembered for the session.
-- While `CRM_ENDPOINT` is empty, submissions are logged to the console and are not sent anywhere.
-- On success the page fires `sloka:enquiry-sent`, plus `gtag('event','generate_lead')` and `fbq('track','Lead')` if those are installed.
+- Container: `<div id="ee-form-8" data-lenis-prevent>` in `index.html`. Loader: ExtraaEdge's `widget.js`, loaded **once** with `defer` (it waits for DOMContentLoaded, then builds the form).
+- `js/enquiry-widget.js` is our glue only: a one-time init fallback, keeping smooth scrolling off the widget's pop-ups/dropdowns, and success detection. It never changes the widget's fields or behaviour.
+- **Success detection:** the widget opens `.ee-form-widget-feedback.success` after a lead is saved (errors/duplicates use `.failure`). On success only: the ticket's RECEIVED stamp, `dataLayer.push({event: "enquiry_submitted"})`, `fbq("track", "Lead")` if the Meta Pixel exists, and the page event `sloka:enquiry-sent`.
+- **UTM:** captured by the widget itself. Its live config maps `utm_source` → LeadSource, `utm_medium` → LeadMedium, `utm_campaign` → LeadCampaign, added to the add-lead request; it also remembers the URL for 30 days.
+- **Styling:** `css/style.css`, section *ExtraaEdge enquiry widget*, scoped to `#ee-form-8` (plus the widget's own dropdown/pop-up classes, which it attaches to `<body>`).
+- **Accessibility/speed notes (vendor code):** the widget loads ~700 KB (jQuery, lodash, phone and date pickers, its 266 KB library, master data) and has a few ARIA issues in its own markup (unnamed dropdowns, "Register Now" label on a "Submit" button). Only ExtraaEdge can change these.
 
 ## Structure
 
@@ -53,17 +52,16 @@ index.html              all sections, semantic markup, SEO + schema
 css/style.css           tokens, layouts, mobile, reduced motion
 js/config.js            site + CRM config (edit me)
 js/app.js               orchestrator
-js/enquiry-form.js      isolated form component
+js/enquiry-widget.js    ExtraaEdge widget glue (init fallback, success → stamp + conversion events)
 js/modules/
   env.js                device flags, pointer, lazy helpers
   mandala.js            SVG mandala builder + bloom / pulse
   smooth.js             Lenis + GSAP ticker, scroll velocity, anchors
   motion.js             colour morph, text and mask reveals, velocity skew, header, footer
   loader.js  spark.js  hero.js  compass.js  seven.js  approach.js
-  pathway.js results.js voice.js bento.js prism.js letter.js
+  pathway.js results.js voice.js bento.js compare.js prism.js letter.js
   stories.js orbit-map.js
   gl.js                 ~2 KB WebGL helper (hero breathing, swim ripple, particles)
-api/enquiry.js          serverless CRM proxy
 scripts/serve.mjs       local static server
 ```
 
@@ -81,5 +79,5 @@ For WebGL I used a small hand-written helper (`gl.js`) instead of Three.js/OGL. 
 - `prefers-reduced-motion`: no loader bloom, no smooth scroll, no pinning effects. The prism lays flat, every station is open and reveals become simple fades.
 - If the CDN fails, the page stays fully readable with no motion. The form still works on its own.
 - Every toy has static content in the DOM: the slider has a text summary, the physics section has its headline and a token grid, and the map has a hidden list of areas.
-- **Mobile Lighthouse** (local, gzip on, simulated slow 4G + mid-range phone): Performance 96, Accessibility 100, Best Practices 96, SEO 100. LCP 2.6–2.7 s, CLS 0.02, TBT ≈ 0 ms. The only Best Practices miss is the missing Cambridge badge file (404). Re-run on the live URL once the badge and real photos are in.
+- **Mobile Lighthouse** (local, gzip on, simulated slow 4G + mid-range phone): Performance 96, Accessibility 100, Best Practices 96, SEO 100. LCP 2.6–2.7 s, CLS 0.02, TBT ≈ 0 ms. Measured before the ExtraaEdge widget was added; with the widget, mobile Performance is about 76–78 (see Enquiry form notes). Re-run on the live URL.
 - Phones get: 480px images, WebP logo/signature, non-blocking fonts, a quicker loader, below-the-fold set-up deferred until the loader opens, a stacked memorise/understand split, an elliptical map with collision-free labels, ≥44px tap targets and ≥12px text.

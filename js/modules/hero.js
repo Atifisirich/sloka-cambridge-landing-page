@@ -1,8 +1,9 @@
 /* =====================================================================
    Hero: WebGL "breathing" photo + headline letters that behave like iron
    filings near a magnet (each letter turns toward the cursor and leans in).
+   Phones: the letters follow a finger, and the photo drifts as the phone tilts.
    ===================================================================== */
-import { env, pointer, lerp, visibility } from './env.js';
+import { env, pointer, tilt, lerp, visibility } from './env.js';
 import { splitChars } from './split.js';
 import { imageQuad, loadImage, COVER } from './gl.js';
 import { spark } from './spark.js';
@@ -28,11 +29,20 @@ export function initHero() {
   const title = hero.querySelector('.hero__title');
   const chars = splitChars(title);
 
-  // ----- WebGL breathing (desktop). Mobile keeps the CSS breathing on the <img>.
-  if (env.rich && !env.lowPower) initGL(hero);
+  // ----- WebGL breathing (all devices; the <img> keeps a CSS breathing fallback).
+  // Phones start it once the page has loaded and gone idle, so shader set-up never
+  // competes with first paint; the CSS breathing covers the photo until then.
+  if (!env.reduced) {
+    if (!env.touch) initGL(hero);
+    else {
+      const start = () => ('requestIdleCallback' in window ? requestIdleCallback(() => initGL(hero), { timeout: 2000 }) : setTimeout(() => initGL(hero), 200));
+      if (document.readyState === 'complete') setTimeout(start, 4500);
+      else addEventListener('load', () => setTimeout(start, 4500), { once: true });
+    }
+  }
 
-  // ----- magnet letters
-  if (env.rich) {
+  // ----- magnet letters (cursor on desktop, finger on phones)
+  if (!env.reduced) {
     let inView = true, rects = [];
     const state = chars.map(() => ({ r: 0, x: 0, y: 0 }));
     const measure = () => {
@@ -47,7 +57,7 @@ export function initHero() {
     document.fonts?.ready.then(measure);
     visibility(hero, (v) => (inView = v));
 
-    const R = 220;
+    const R = env.touch ? 160 : 220, PULL = env.touch ? 14 : 9;
     gsap.ticker.add(() => {
       if (!inView) return;
       for (let i = 0; i < chars.length; i++) {
@@ -60,8 +70,8 @@ export function initHero() {
         if (ang < -90) ang += 180;
         const s = state[i];
         s.r = lerp(s.r, ang * 0.32 * f, 0.14);
-        s.x = lerp(s.x, (dx / (d || 1)) * 9 * f, 0.14);
-        s.y = lerp(s.y, (dy / (d || 1)) * 9 * f, 0.14);
+        s.x = lerp(s.x, (dx / (d || 1)) * PULL * f, 0.14);
+        s.y = lerp(s.y, (dy / (d || 1)) * PULL * f, 0.14);
         if (Math.abs(s.r) + Math.abs(s.x) + Math.abs(s.y) > 0.01 || f > 0) {
           chars[i].style.transform = `translate(${s.x.toFixed(2)}px, ${s.y.toFixed(2)}px) rotate(${s.r.toFixed(2)}deg)`;
         }
@@ -102,7 +112,7 @@ async function initGL(hero) {
   try {
     await (imgEl.complete ? Promise.resolve() : new Promise((r) => imgEl.addEventListener('load', r, { once: true })));
     const img = await loadImage(imgEl.currentSrc || imgEl.src);
-    const quad = imageQuad(canvas, img, FRAG);
+    const quad = imageQuad(canvas, img, FRAG, { dpr: Math.min(devicePixelRatio, env.touch ? 1.25 : 1.75) });
     if (!quad) return;
     hero.classList.add('gl-on');
     setTimeout(() => (imgEl.style.visibility = 'hidden'), 1100);
@@ -112,8 +122,11 @@ async function initGL(hero) {
     const t0 = performance.now();
     gsap.ticker.add(() => {
       if (!inView) return;
-      mx = lerp(mx, (pointer.x / innerWidth - 0.5), 0.05);
-      my = lerp(my, (pointer.y / innerHeight - 0.5), 0.05);
+      // phones: the photo drifts with the tilt of the phone; desktop: with the cursor
+      const tx = env.touch ? tilt.x * 1.6 : pointer.x / innerWidth - 0.5;
+      const ty = env.touch ? tilt.y * 1.6 : pointer.y / innerHeight - 0.5;
+      mx = lerp(mx, tx, 0.05);
+      my = lerp(my, ty, 0.05);
       quad.render({
         uTime: (performance.now() - t0) / 1000,
         uMouse: [mx, my],

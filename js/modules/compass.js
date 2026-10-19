@@ -3,8 +3,9 @@
    Idle: the needle swings loosely. Cursor approaches: the badge is pulled
    toward it (magnetic) and the needle locks onto the cursor.
    Click: needle snaps to N, the badge ripples, then the link opens in a new tab.
+   Phones: the needle points to real north using the phone's compass.
    ===================================================================== */
-import { env, pointer, lerp } from './env.js';
+import { env, pointer, tilt, lerp } from './env.js';
 
 const DIAL = `
 <svg viewBox="-50 -50 100 100">
@@ -49,6 +50,11 @@ export function initCompasses() {
         const f = 1 - d / R;
         c.x = lerp(c.x, dx * 0.28 * f, 0.15);
         c.y = lerp(c.y, dy * 0.28 * f, 0.15);
+      } else if (env.touch && tilt.heading != null) {
+        // a real compass: the N end of the needle points north, with a little wobble
+        target = -tilt.heading + Math.sin(time * 2.1 + c.seed) * 3;
+        c.x = lerp(c.x, 0, 0.1);
+        c.y = lerp(c.y, 0, 0.1);
       } else {
         // loose idle swing: a wandering target with springy needle physics
         target = Math.sin(time * 0.6 + c.seed) * 70 + Math.sin(time * 1.7 + c.seed) * 25;

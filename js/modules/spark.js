@@ -13,6 +13,7 @@ const glow = el?.querySelector('.spark__glow');
 
 const pos = { x: -100, y: -100, gx: -100, gy: -100, rot: 0, scale: 1, targetScale: 1 };
 let running = false;
+let fly = null; // phones: a tap sends the spark to the finger for a moment
 
 export const spark = {
   ready: false,
@@ -29,18 +30,24 @@ export const spark = {
     this.ready = true;
     if (!running) { running = true; gsap.ticker.add(tick); }
     if (!env.touch) bindHover();
+    else bindTap();
   }
 };
 
 function tick() {
   let tx, ty;
-  if (env.touch || env.mobile) {
+  if (fly && performance.now() < fly.until) {
+    // tapped: fly to the finger, spinning, then glide back to the edge
+    tx = fly.x; ty = fly.y;
+    pos.rot += 9;
+  } else if (env.touch || env.mobile) {
+    if (fly) { fly = null; pos.targetScale = 1; }
     // scroll rider: hugs the right edge and travels with reading progress
     const max = document.documentElement.scrollHeight - innerHeight;
     const prog = max > 0 ? scrollY / max : 0;
     tx = innerWidth - 22;
     ty = 90 + prog * (innerHeight - 200);
-    pos.rot = scrollY * 0.25;
+    pos.rot = lerp(pos.rot, scrollY * 0.25, 0.2);
   } else {
     tx = pointer.active ? pointer.x + 22 : pos.x;
     ty = pointer.active ? pointer.y + 22 : pos.y;
@@ -53,6 +60,21 @@ function tick() {
   pos.scale = lerp(pos.scale, pos.targetScale, 0.15);
   m.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${pos.rot}deg) scale(${pos.scale})`;
   glow.style.transform = `translate3d(${pos.gx}px, ${pos.gy}px, 0)`;
+}
+
+/* Phones: a quick tap on empty space (not a link, button or field) calls the spark over */
+function bindTap() {
+  let down = null;
+  addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') down = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true });
+  addEventListener('pointerup', (e) => {
+    if (!down || e.pointerType !== 'touch') return;
+    const quick = performance.now() - down.t < 350 && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 10;
+    down = null;
+    if (!quick || e.target.closest('a, button, input, select, textarea, label, [role="button"], canvas, .split__stage, #ee-form-8, .ee-form-widget, .select2-container')) return;
+    fly = { x: e.clientX, y: e.clientY, until: performance.now() + 1100 };
+    pos.targetScale = 2.2;
+    pulse(m, 1.6);
+  }, { passive: true });
 }
 
 function bindHover() {

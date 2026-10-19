@@ -19,7 +19,10 @@ export function initBento() {
   initGlide();
   initSplash();
   initCare();
-  if (env.rich && !env.lowPower) {
+  initOnAir();
+  initSlides();
+  // WebGL tiles run everywhere; phones get lighter versions driven by taps and scrolling
+  if (!env.reduced) {
     whenNear(document.querySelector('[data-particles]'), () => initParticles(document.querySelector('[data-particles]')));
     whenNear(document.querySelector('[data-ripple]'), () => initRipple(document.querySelector('[data-ripple]')));
   }
@@ -83,6 +86,47 @@ function initTyping() {
 }
 
 /* ---------- Biz Talk vinyl ---------- */
+/* ---------- Sports slideshow: cross-fade, caption swaps to match the photo ---------- */
+function initSlides() {
+  const tile = document.querySelector('[data-slides]');
+  if (!tile) return;
+  const slides = [...tile.querySelectorAll('.slide')];
+  const cap = tile.querySelector('.slides__caption');
+  const dots = tile.querySelector('.slides__dots');
+  dots.innerHTML = slides.map(() => '<span></span>').join('');
+  let i = 0, timer = null, visible = false;
+  const paintDots = () => [...dots.children].forEach((d, k) => d.classList.toggle('is-on', k === i));
+  const show = (n) => {
+    slides[i].classList.remove('is-on');
+    i = (n + slides.length) % slides.length;
+    slides[i].classList.add('is-on');
+    paintDots();
+    const text = slides[i].dataset.caption;
+    if (env.reduced || !window.gsap) { cap.textContent = text; return; }
+    gsap.timeline()
+      .to(cap, { yPercent: -100, duration: 0.3, ease: 'power2.in' })
+      .add(() => (cap.textContent = text))
+      .fromTo(cap, { yPercent: 100 }, { yPercent: 0, duration: 0.55, ease: 'power3.out' });
+  };
+  paintDots();
+  const play = () => {
+    clearInterval(timer);
+    if (!env.reduced && slides.length > 1) timer = setInterval(() => { if (visible) show(i + 1); }, 3400);
+  };
+  visibility(tile, (v) => (visible = v));
+  play();
+  const next = () => { show(i + 1); play(); };
+  tile.addEventListener('click', next);
+  tile.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); } });
+}
+
+/* ---------- Biz Talk: ON AIR lights up while the tile is on screen (phones have no hover) ---------- */
+function initOnAir() {
+  const tile = document.querySelector('.tile--biz');
+  if (!tile || !env.touch || env.reduced) return;
+  new IntersectionObserver(([e]) => tile.classList.toggle('is-live', e.isIntersecting), { threshold: 0.6 }).observe(tile);
+}
+
 function initVinyl() {
   const disc = document.querySelector('.vinyl__disc');
   if (!disc || env.reduced) return;
@@ -193,7 +237,7 @@ async function initParticles(box) {
     gl.useProgram(prog);
     texture(gl, img);
 
-    const dpr = Math.min(devicePixelRatio, 1.5);
+    const dpr = Math.min(devicePixelRatio, env.touch ? 1.25 : 1.5);
     let cols = 0, rows = 0, count = 0;
     const uv = gl.createBuffer(), rnd = gl.createBuffer();
     const U = (n) => gl.getUniformLocation(prog, n);
@@ -203,7 +247,7 @@ async function initParticles(box) {
       const w = box.clientWidth, h = box.clientHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
-      cols = 130; rows = Math.round((cols * h) / w); count = cols * rows;
+      cols = env.touch ? 90 : 130; rows = Math.round((cols * h) / w); count = cols * rows;
       const a = new Float32Array(count * 2), r = new Float32Array(count * 3);
       for (let y = 0, k = 0; y < rows; y++) for (let x = 0; x < cols; x++, k++) {
         a[k * 2] = (x + 0.5) / cols; a[k * 2 + 1] = (y + 0.5) / rows;
@@ -237,20 +281,32 @@ async function initParticles(box) {
       const r = box.getBoundingClientRect();
       mouse = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
     });
-    tile.addEventListener('pointerenter', () => {
+    const settle = () => { running = false; draw(); imgEl.style.opacity = '1'; canvas.style.opacity = '0'; };
+    function burst() {
       if (!running) { running = true; loop(); }
       canvas.style.opacity = '1'; imgEl.style.opacity = '0';
       gsap.killTweensOf(state);
-      // scatter out, then drift back together while still hovered
-      gsap.timeline()
+      // scatter out, then drift back together
+      gsap.timeline({ onComplete: env.touch ? settle : undefined })
         .to(state, { s: 1, duration: 0.7, ease: 'power3.out' })
         .to(state, { s: 0, duration: 1.6, ease: 'elastic.out(1, .6)', delay: 0.15 });
-    });
+    }
+    if (env.touch) {
+      // phones: bursts as it scrolls into view, and again on every tap
+      ScrollTrigger.create({ trigger: tile, start: 'top 60%', onEnter: burst, onEnterBack: burst });
+      tile.addEventListener('pointerdown', (e) => {
+        const r = box.getBoundingClientRect();
+        mouse = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+        burst();
+      });
+      return;
+    }
+    tile.addEventListener('pointerenter', burst);
     tile.addEventListener('pointerleave', () => {
       gsap.killTweensOf(state);
       gsap.to(state, {
         s: 0, duration: 0.6, ease: 'power3.out',
-        onComplete: () => { running = false; draw(); imgEl.style.opacity = '1'; canvas.style.opacity = '0'; }
+        onComplete: settle
       });
     });
   } catch (e) { console.warn('[bento] particles off', e); }
@@ -283,7 +339,7 @@ async function initRipple(box) {
     const canvas = document.createElement('canvas');
     canvas.setAttribute('aria-hidden', 'true');
     box.appendChild(canvas);
-    const quad = imageQuad(canvas, img, RIPPLE, { dpr: Math.min(devicePixelRatio, 1.5) });
+    const quad = imageQuad(canvas, img, RIPPLE, { dpr: Math.min(devicePixelRatio, env.touch ? 1.25 : 1.5) });
     if (!quad) return;
     let visible = false, strength = 0, target = 0, mx = 0.5, my = 0.5, tx = 0.5, ty = 0.5;
     visibility(box, (v) => (visible = v));
@@ -295,6 +351,19 @@ async function initRipple(box) {
       target = Math.min(1, 0.4 + pointer.speed * 1.5);
     });
     tile.addEventListener('pointerleave', () => (target = 0));
+    if (env.touch) {
+      // phones: a tap drops a stone where the finger lands; the pool also ripples on its own
+      tile.addEventListener('pointerdown', (e) => {
+        const r = box.getBoundingClientRect();
+        tx = mx = (e.clientX - r.left) / r.width; ty = my = (e.clientY - r.top) / r.height;
+        strength = 0; target = 1;
+      });
+      setInterval(() => {
+        if (!visible || target > 0.2) return;
+        tx = mx = 0.2 + Math.random() * 0.6; ty = my = 0.2 + Math.random() * 0.6;
+        strength = 0; target = 0.6;
+      }, 2600);
+    }
     const t0 = performance.now();
     gsap.ticker.add(() => {
       if (!visible) return;

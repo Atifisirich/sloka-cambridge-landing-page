@@ -65,7 +65,8 @@ export function initOrbitMap() {
   /* Nudge each name around its ring (closest free angle) until it overlaps
      no other name and stays clear of the centre and the edges. Runs once fonts
      are ready so text widths are real. Bearings stay roughly true ("not to scale"). */
-  const LIMIT_X = 490, LIMIT_Y = env.mobile ? 610 : 490;
+  // phones keep a wider safety margin: their fonts/text-size settings can make names wider
+  const LIMIT_X = env.mobile ? 455 : 490, LIMIT_Y = env.mobile ? 600 : 490;
   function boxAt(it, angle, radius) {
     const a = (angle * Math.PI) / 180;
     const x = Math.sin(a) * radius * SX, y = -Math.cos(a) * radius * SY;
@@ -104,7 +105,7 @@ export function initOrbitMap() {
 
   function place() {
     items.forEach((it, i) => {
-      const breathe = env.reduced ? 0 : Math.sin(t * 0.8 + it.ring * 1.4) * (env.mobile ? 4 : 8);
+      const breathe = env.reduced || env.mobile ? 0 : Math.sin(t * 0.8 + it.ring * 1.4) * 8;
       const r = it.radius + breathe;
       const a = ((it.angle + spin) * Math.PI) / 180;
       it.x = Math.sin(a) * r * SX;
@@ -117,12 +118,24 @@ export function initOrbitMap() {
       it.text.setAttribute('text-anchor', right ? 'start' : 'end');
     });
   }
+  // Lay out again whenever real text widths may have changed: once the display
+  // font has actually loaded (it loads lazily, after fonts.ready can already have
+  // resolved), when any font finishes loading, and on resize/rotation.
+  const relayout = () => { layout(); place(); if (hit) drawRoute(hit, false); };
   layout();
   place();
-  document.fonts?.ready.then(() => { layout(); place(); });
+  document.fonts?.load(`${sizes[0]}px Gloock`).then(relayout).catch(() => {});
+  document.fonts?.addEventListener?.('loadingdone', relayout);
+  let resizeTimer;
+  addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(relayout, 200); });
+
+  // Phones: names are placed once and never re-drawn per frame (some phone GPUs
+  // leave unpainted strips when many SVG texts move every frame). The "breathing"
+  // is a single GPU-composited scale on the whole map instead (see .orbit-map--still).
+  if (env.mobile && !env.reduced) wrap.classList.add('orbit-map--still');
 
   visibility(wrap, (v) => (visible = v));
-  if (!env.reduced) {
+  if (!env.reduced && !env.mobile) {
     gsap.ticker.add(() => {
       if (!visible) return;
       t += 0.016;

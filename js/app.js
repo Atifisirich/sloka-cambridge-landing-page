@@ -16,6 +16,7 @@ import { initPathway } from './modules/pathway.js';
 import { initResults } from './modules/results.js';
 import { initVoice } from './modules/voice.js';
 import { initBento } from './modules/bento.js';
+import { initCompare } from './modules/compare.js';
 import { initPrism } from './modules/prism.js';
 import { initLetter } from './modules/letter.js';
 import { initStories } from './modules/stories.js';
@@ -68,23 +69,24 @@ if (!env.hasLibs) {
   // ...everything below the fold is set up once the loader opens, so a phone's
   // CPU is free for the first seconds. Order matters: pins are created top-to-bottom.
   let setUp = false;
-  const setUpPage = () => {
+  // Each section is set up in its own small step, with a pause between steps,
+  // so a phone never freezes for one long block (still strictly in page order).
+  const breathe = () => new Promise((r) => setTimeout(r, 0));
+  const setUpPage = async () => {
     if (setUp) return;
     setUp = true;
-    initSeven();
-    initApproach();
-    initPathway();          // pin #1
-    initResults();
-    initVoice();
-    initBento();
-    initPrism();            // pin #2
-    initLetter();           // pin #3 (laptops/desktops)
-    initStories();
-    initOrbitMap();
-    initImageReveals();
-    initSkew();
-    initChrome();
-    initFooter();
+    const steps = [
+      initSeven, initApproach,
+      initPathway,          // pin #1
+      initResults, initVoice, initBento, initCompare,
+      initPrism,            // pin #2
+      initLetter,           // pin #3 (laptops/desktops)
+      initStories, initOrbitMap, initImageReveals, initSkew, initChrome, initFooter
+    ];
+    for (const step of steps) {
+      step();
+      await breathe();
+    }
 
     // line-based effects need final font metrics
     const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]) : Promise.resolve();
@@ -100,7 +102,7 @@ if (!env.hasLibs) {
   runLoader().then(() => { intro.play(); setTimeout(setUpPage, 0); });
   setTimeout(setUpPage, 6000); // safety net if the loader never resolves
 
-  // the spark celebrates a sent enquiry (event from js/enquiry-form.js)
+  // the spark celebrates a sent enquiry (event from js/enquiry-widget.js)
   document.addEventListener('sloka:enquiry-sent', () => spark.bloom(2));
 
   // late-loading images change layout heights → refresh pins once everything is in

@@ -17,10 +17,11 @@ env.rich = !env.reduced && !env.touch && !env.mobile;
 export const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
 
-/* Pointer position, tracked once for everyone */
-export const pointer = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, speed: 0, active: false };
+/* Pointer position, tracked once for everyone. A finger counts as "active" only
+   while it is on the screen, so touch effects relax when it lifts. */
+export const pointer = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, speed: 0, active: false, touch: false };
 let lastT = performance.now();
-window.addEventListener('pointermove', (e) => {
+const track = (e) => {
   const now = performance.now();
   const dt = Math.max(8, now - lastT);
   pointer.vx = (e.clientX - pointer.x) / dt;
@@ -29,8 +30,43 @@ window.addEventListener('pointermove', (e) => {
   pointer.x = e.clientX;
   pointer.y = e.clientY;
   pointer.active = true;
+  pointer.touch = e.pointerType === 'touch';
   lastT = now;
-}, { passive: true });
+};
+window.addEventListener('pointermove', track, { passive: true });
+window.addEventListener('pointerdown', (e) => { lastT = performance.now(); pointer.x = e.clientX; pointer.y = e.clientY; track(e); }, { passive: true });
+const lift = (e) => { if (e.pointerType === 'touch') { pointer.active = false; pointer.speed = 0; } };
+window.addEventListener('pointerup', lift, { passive: true });
+window.addEventListener('pointercancel', lift, { passive: true });
+
+/* Phone tilt + compass heading (DeviceOrientation). Android starts straight away;
+   iPhone needs permission, which is asked on the visitor's first tap. */
+export const tilt = { x: 0, y: 0, heading: null, active: false };
+let tiltOn = false;
+function onOrient(e) {
+  if (e.gamma == null) return;
+  tilt.active = true;
+  tilt.x = clamp(e.gamma / 35, -1, 1);           // left/right
+  tilt.y = clamp((e.beta - 45) / 35, -1, 1);      // forward/back from a natural holding angle
+  if (typeof e.webkitCompassHeading === 'number') tilt.heading = e.webkitCompassHeading; // iPhone
+  else if (e.absolute && e.alpha != null) tilt.heading = 360 - e.alpha;                  // Android
+}
+function startTilt() {
+  if (tiltOn) return;
+  tiltOn = true;
+  addEventListener('deviceorientationabsolute', onOrient, { passive: true });
+  addEventListener('deviceorientation', onOrient, { passive: true });
+}
+if (env.touch && typeof DeviceOrientationEvent !== 'undefined') {
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    addEventListener('pointerup', function ask() {
+      removeEventListener('pointerup', ask);
+      DeviceOrientationEvent.requestPermission().then((s) => s === 'granted' && startTilt()).catch(() => {});
+    });
+  } else {
+    startTilt();
+  }
+}
 
 /* Run `fn` once when `el` comes near the viewport (lazy init for heavy toys). */
 export function whenNear(el, fn, margin = '300px') {

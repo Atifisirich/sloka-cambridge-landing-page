@@ -34,6 +34,9 @@ export function runLoader() {
   return new Promise((resolve) => {
     const p = parts(mandalaEl);
     const tl = gsap.timeline({ onComplete: () => { done(); } });
+    // phones: the whole sequence (bloom, spin and curtain) runs a little faster so
+    // the hero appears sooner on slower connections and CPUs
+    if (env.mobile && !seen) tl.timeScale(1.3);
 
     tl.add(bloomTimeline(mandalaEl, { speed }))
       .to(logo, { opacity: 1, duration: 0.5 / speed }, '-=0.4')

@@ -35,7 +35,7 @@ export function initPrism() {
   gsap.to(prism, {
     rotateY: -72 * (faces.length - 1), ease: 'none',
     scrollTrigger: {
-      trigger: section, pin: true, start: 'top top', end: () => `+=${innerHeight * 2.6}`,
+      trigger: section, pin: true, anticipatePin: 1, start: 'top top', end: () => `+=${innerHeight * 2.6}`,
       scrub: 0.6,
       snap: { snapTo: 1 / (faces.length - 1), duration: { min: 0.25, max: 0.6 }, delay: 0.05, ease: 'power2.inOut' },
       onUpdate: (st) => setActive(Math.round(st.progress * (faces.length - 1)))

@@ -1,9 +1,11 @@
 /* =====================================================================
    Results: 12 yellow A* medallions and 24 maroon A tiles fall into a pit
    (Matter.js). Grab, throw and stack them; a counter ticks as they land.
-   Fallback (mobile / reduced motion / no Matter): a neat stacked grid.
+   Tap the pile to make tokens jump. Phones: drag and flick with a finger
+   (empty space still scrolls the page) and tilt the phone to tip the pile.
+   Fallback (reduced motion / no Matter): a neat stacked grid.
    ===================================================================== */
-import { env, whenNear, loadScript, visibility } from './env.js';
+import { env, tilt, whenNear, loadScript, visibility } from './env.js';
 import { spark } from './spark.js';
 
 const STARS = 12, AS = 24;
@@ -14,7 +16,7 @@ export function initResults() {
   const pit = section.querySelector('[data-physics]');
   const counter = section.querySelector('[data-count-total]');
 
-  if (!env.rich) { fallbackGrid(section, pit); return; }
+  if (env.reduced) { fallbackGrid(section, pit); return; }
 
   counter.textContent = '0';
   whenNear(pit, async () => {
@@ -66,13 +68,13 @@ function sprite(size, draw) {
 }
 
 function startPhysics(pit, counter) {
-  const { Engine, Bodies, Composite, Mouse, MouseConstraint, Events, Body } = window.Matter;
+  const { Engine, Bodies, Composite, Mouse, MouseConstraint, Events, Body, Constraint, Query } = window.Matter;
   const canvas = pit.querySelector('.results__canvas');
   const ctx = canvas.getContext('2d');
   const dpr = Math.min(devicePixelRatio, 2);
   let W = pit.clientWidth, H = pit.clientHeight;
 
-  const R = W < 1100 ? 30 : 36;              // medallion radius
+  const R = W < 600 ? 22 : W < 1100 ? 30 : 36; // medallion radius (smaller on phones)
   const S = R * 1.65;                        // tile size
 
   const starImg = sprite(R * 2.6, (c) => {
@@ -142,21 +144,81 @@ function startPhysics(pit, counter) {
     });
   });
 
-  // grab & throw
-  const mouse = Mouse.create(canvas);
-  mouse.pixelRatio = 1;
-  // let the page keep scrolling over the canvas
-  mouse.element.removeEventListener('wheel', mouse.mousewheel);
-  mouse.element.removeEventListener('mousewheel', mouse.mousewheel);
-  mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel);
-  const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
-  Composite.add(engine.world, mc);
+  const local = (x, y) => { const r = canvas.getBoundingClientRect(); return { x: x - r.left, y: y - r.top }; };
+
+  // tap on empty space: nearby tokens jump up and away from the finger/cursor
+  function burst(p) {
+    tokens.forEach((b) => {
+      const dx = b.position.x - p.x, dy = b.position.y - p.y, d = Math.hypot(dx, dy) || 1;
+      if (d > 170) return;
+      const k = 1 - d / 170;
+      Body.setVelocity(b, { x: (dx / d) * 7 * k + (Math.random() - 0.5) * 2, y: -16 * k - 2 });
+      Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.4);
+    });
+    spark.bloom(0.8);
+  }
+
+  if (env.touch) {
+    // Own touch handling (Matter's mouse would block page scrolling over the canvas):
+    // touching a token grabs it (and only then stops the page scrolling); touching
+    // empty space scrolls as normal, and a quick tap there makes the pile jump.
+    let drag = null, tap = null;
+    canvas.addEventListener('touchstart', (e) => {
+      const t = e.changedTouches[0];
+      const p = local(t.clientX, t.clientY);
+      const hit = Query.point(tokens, p)[0];
+      if (hit) {
+        e.preventDefault();
+        drag = Constraint.create({ pointA: p, bodyB: hit, pointB: { x: p.x - hit.position.x, y: p.y - hit.position.y }, stiffness: 0.25, length: 0 });
+        Composite.add(engine.world, drag);
+      } else {
+        tap = { ...p, sx: t.clientX, sy: t.clientY, t: performance.now() };
+      }
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      if (!drag) return;
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      drag.pointA = local(t.clientX, t.clientY);
+    }, { passive: false });
+    const end = (e) => {
+      if (drag) { Composite.remove(engine.world, drag); drag = null; }
+      else if (tap) {
+        const t = e.changedTouches[0];
+        if (performance.now() - tap.t < 300 && Math.hypot(t.clientX - tap.sx, t.clientY - tap.sy) < 10) burst(tap);
+      }
+      tap = null;
+    };
+    canvas.addEventListener('touchend', end);
+    canvas.addEventListener('touchcancel', end);
+  } else {
+    // grab & throw with the mouse
+    const mouse = Mouse.create(canvas);
+    mouse.pixelRatio = 1;
+    // let the page keep scrolling over the canvas
+    mouse.element.removeEventListener('wheel', mouse.mousewheel);
+    mouse.element.removeEventListener('mousewheel', mouse.mousewheel);
+    mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+    const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+    Composite.add(engine.world, mc);
+    let down = null;
+    canvas.addEventListener('mousedown', (e) => {
+      const p = local(e.clientX, e.clientY);
+      down = Query.point(tokens, p).length ? null : { ...p, sx: e.clientX, sy: e.clientY, t: performance.now() };
+    });
+    canvas.addEventListener('mouseup', (e) => {
+      if (down && performance.now() - down.t < 300 && Math.hypot(e.clientX - down.sx, e.clientY - down.sy) < 6) burst(down);
+      down = null;
+    });
+  }
 
   let visible = true;
   visibility(pit, (v) => (visible = v), '100px');
 
   gsap.ticker.add(() => {
     if (!visible) return;
+    // phones: gravity follows the tilt of the phone, so the pile slides as you tip it
+    if (tilt.active) engine.gravity.x = tilt.x * 1.1;
     Engine.update(engine, 1000 / 60);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);

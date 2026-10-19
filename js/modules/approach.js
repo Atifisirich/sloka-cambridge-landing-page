@@ -51,8 +51,31 @@ export function initApproach() {
     const g = document.createElementNS(NS, 'g');
     g.innerHTML = `<circle class="bud" cx="${x}" cy="${y + 10}" r="${parent ? 5 : 0}"/><text class="leaf${parent ? '' : ' leaf--root'}" x="${x}" y="${y}" text-anchor="middle" font-size="${size}">${label}</text>`;
     svg.appendChild(g);
-    leaves.push({ g, at });
+    leaves.push({ g, at, text: g.querySelector('text'), x, size });
   });
+
+  // Keep every question fully inside the panel: measure the real rendered width
+  // (phones may use bigger text sizes or different font metrics), shrink a label
+  // that is too long, then nudge it inward from the edges.
+  const VB_W = 600, PAD = 10;
+  function fitLeaves() {
+    leaves.forEach((l) => {
+      l.text.setAttribute('font-size', l.size);
+      let w = l.text.getComputedTextLength();
+      if (!w) return;
+      if (w > VB_W - PAD * 2) {
+        l.text.setAttribute('font-size', (l.size * (VB_W - PAD * 2)) / w);
+        w = l.text.getComputedTextLength();
+      }
+      const half = w / 2;
+      l.text.setAttribute('x', clamp(l.x, PAD + half, VB_W - PAD - half).toFixed(1));
+    });
+  }
+  fitLeaves();
+  document.fonts?.load('24px Gloock').then(fitLeaves).catch(() => {});
+  document.fonts?.addEventListener?.('loadingdone', fitLeaves);
+  let fitTimer;
+  addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitLeaves, 200); });
   branches.forEach((b) => { b.len = b.path.getTotalLength(); b.path.style.strokeDasharray = b.len; });
 
   let v = 0.15;
