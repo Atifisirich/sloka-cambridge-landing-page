@@ -531,10 +531,23 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
 .letter__from { margin-bottom: .8em; }
 .letter__salute { font-family: var(--f-display); font-size: 1.6em; color: var(--maroon); }
 .letter__line .line { display: block; }
+.letter__signoff { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px; }
 .signature { width: min(230px, 55%); margin: 6px 0 0 -6px; overflow: visible; }
 .signature__pen { fill: none; stroke: #fff; stroke-width: 46; stroke-linecap: round; stroke-linejoin: round; }
-.letter__sign { margin: .6em 0 0; line-height: 1.4; }
+.letter__sign { margin: 0; line-height: 1.4; }
 .letter__sign strong { font-family: var(--f-display); font-weight: 400; font-size: 1.4em; color: var(--maroon); }
+
+/* Fit mode (set by js/modules/letter.js on laptops/desktops): the section is held
+   on screen while the letter unfolds, so the whole letter is visible at once. */
+.principal.is-fit { height: 100vh; height: 100svh; display: grid; place-items: center; padding: calc(var(--header-h) * .6) var(--gutter) 16px; overflow: hidden; }
+.principal.is-fit .letter-scene { max-width: 1060px; width: 100%; transform-origin: 50% 50%; }
+.principal.is-fit .letter__face { padding: 22px 56px; font-size: 1.02rem; line-height: 1.6; }
+.principal.is-fit .letter__panel--top .letter__face { padding-top: 30px; }
+.principal.is-fit .letter__line { margin-bottom: .7em; }
+.principal.is-fit .letter__salute { font-size: 1.45em; margin-bottom: .4em; }
+.principal.is-fit .letter__portrait { width: 132px; margin-bottom: 6px; }
+.principal.is-fit .letter__from { margin-bottom: .3em; }
+.principal.is-fit .signature { width: 170px; margin-top: 0; }
 
 /* ---------- 14b. Parent stories desk ---------- */
 .stories { padding: clamp(90px, 14vh, 170px) var(--gutter); max-width: calc(var(--max) + 2 * var(--gutter)); margin: 0 auto; }
