@@ -19,7 +19,7 @@ Open http://localhost:5173. ES modules need a server; opening `index.html` from 
 | Logo | Done. `assets/brand/sloka-logo.png` (640px web copy) and `sloka-logo-original.png` (full size). Only the black JPEG corners outside the pill were made transparent |
 | **Cambridge badge** `cambridge-partner-badge.png` | `assets/brand/cambridge-partner-badge.png` |
 | Cambridge Fit link | Done: `js/config.js` → `CAMBRIDGE_FIT_URL` (Google Form, used by all 4 compass buttons) |
-| Phone, WhatsApp, email, address, socials | `js/config.js` → `SLOKA_SITE` (also update the JSON-LD block in `index.html`) |
+| Phone, WhatsApp, email, address, socials | Done, from slokainternational.com/contact-us (Manneguda campus). Edit in `js/config.js` → `SLOKA_SITE` and the JSON-LD block in `index.html` |
 | CRM | `js/config.js` → `SLOKA_ENQUIRY_CONFIG` (see below) |
 | Canonical URL / schema URLs | `index.html` `<head>` (currently `example.com`) |
 | Google Analytics / Meta Pixel IDs | commented blocks in `index.html` `<head>` |

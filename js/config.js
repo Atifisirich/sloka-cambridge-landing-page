@@ -7,19 +7,25 @@ window.SLOKA_SITE = {
   // Cambridge Fit button: every [data-cambridge-link] on the page uses this.
   CAMBRIDGE_FIT_URL: 'https://forms.gle/tTd3XyJwTcrBPHws8',
 
-  // Contact details (shown in footer, location and schema). Replace placeholders.
-  PHONE_DISPLAY: '+91 00000 00000',
-  PHONE_E164: '+910000000000',
-  WHATSAPP_NUMBER: '910000000000', // digits only, with country code
+  // Manneguda campus contact details, from the school's official site
+  // (slokainternational.com/contact-us, "For Admission related enquiry: Manneguda Campus").
+  PHONE_DISPLAY: '+91 96403 34460',
+  PHONE_E164: '+919640334460',
+  PHONE2_DISPLAY: '+91 96406 69989',
+  PHONE2_E164: '+919640669989',
+  WHATSAPP_NUMBER: '919640334460', // the number the school's own WhatsApp button uses
   WHATSAPP_TEXT: 'Hello Sloka Manneguda, I just sent an admission enquiry and would like to know more.',
-  EMAIL: 'admissions@example.com',
-  ADDRESS: '[STREET ADDRESS], Manneguda, Hyderabad, Telangana [PIN CODE]',
-  DIRECTIONS_URL: 'https://www.google.com/maps/dir/?api=1&destination=Sloka+International+School+Manneguda',
+  EMAIL: 'admission@slokainternational.com',   // admissions
+  EMAIL2: 'info@slokainternational.com',       // general
+  ADDRESS: 'Exit 12 Sports, Turkayamjal Rd, opp. RTA Office, Manneguda, Telangana 501510',
+  OFFICE_HOURS: 'Office: 8:30 AM – 5:00 PM · School: Mon–Sat, 8:30 AM – 3:30 PM',
+  DIRECTIONS_URL: 'https://www.google.com/maps/dir/?api=1&destination=Sloka+International+School+Turkayamjal+Rd+Manneguda+Telangana+501510',
 
   SOCIAL: {
-    instagram: '#',
-    facebook: '#',
-    youtube: '#'
+    instagram: 'https://www.instagram.com/slokainternationalschool/',
+    facebook: 'https://www.facebook.com/slokaInternationalschoolhyderabad/',
+    youtube: 'https://www.youtube.com/channel/UCkjdzOBYB6-ApScJNpQnKxQ',
+    x: 'https://twitter.com/slokaschool'
   },
 
   // Areas shown on the orbit map and in the enquiry form's "Area" dropdown.

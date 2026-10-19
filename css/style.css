@@ -711,6 +711,9 @@ mark.is-marked { background-size: 100% 100%; }
 .footer__brand .compass { margin-top: 10px; }
 .footer__h { font-family: var(--f-body); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .18em; color: var(--yellow); margin-bottom: 14px; }
 .footer address { font-style: normal; }
+.footer__hours { margin: 10px 0 0; font-size: .92rem; opacity: .85; }
+.location__phone { display: block; width: fit-content; margin-top: 10px; color: var(--yellow); font-weight: 700; font-size: 1.15rem; text-decoration: none; padding: 6px 0; }
+.location__phone:hover { text-decoration: underline; }
 .footer__list { list-style: none; margin: 0; padding: 0; }
 .footer__list li { margin-bottom: 8px; }
 .footer a { text-decoration-color: rgba(249, 194, 18, .5); text-underline-offset: 3px; }

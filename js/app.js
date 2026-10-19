@@ -31,6 +31,11 @@ function applyConfig() {
   set('[data-config="address"]', (el) => (el.textContent = c.ADDRESS));
   set('[data-config="phone"]', (el) => (el.textContent = c.PHONE_DISPLAY));
   set('[data-config="email"]', (el) => (el.textContent = c.EMAIL));
+  set('[data-config="phone2"]', (el) => (el.textContent = c.PHONE2_DISPLAY));
+  set('[data-config="email2"]', (el) => (el.textContent = c.EMAIL2));
+  set('[data-config="hours"]', (el) => (el.textContent = c.OFFICE_HOURS));
+  set('[data-config-href="tel2"]', (el) => (el.href = `tel:${c.PHONE2_E164}`));
+  set('[data-config-href="mailto2"]', (el) => (el.href = `mailto:${c.EMAIL2}`));
   set('[data-config-href="tel"]', (el) => (el.href = `tel:${c.PHONE_E164}`));
   set('[data-config-href="mailto"]', (el) => (el.href = `mailto:${c.EMAIL}`));
   set('[data-config-href="directions"]', (el) => (el.href = c.DIRECTIONS_URL));
