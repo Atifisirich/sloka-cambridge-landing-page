@@ -12,20 +12,25 @@ import { splitLines } from './split.js';
 import { bloomTimeline, pulse } from './mandala.js';
 import { spark } from './spark.js';
 
-// rgb() strings (not hex) so gsap.utils.interpolate can blend them
-const COLORS = { cream: 'rgb(251,245,233)', yellow: 'rgb(249,194,18)', maroon: 'rgb(151,27,30)' };
-const GRAIN = { cream: 0.5, yellow: 0.42, maroon: 0.18 };
+const COLORS = { cream: '#FBF5E9', yellow: '#F9C212', maroon: '#971B1E' };
 
-/* ---------- Background morph ---------- */
+/* ---------- Section colour blends ----------
+   Every section keeps its own solid colour, so text always sits on the right
+   background on any screen height. A soft gradient band at the top of each
+   section melts in from the previous section's colour, so colours flow into
+   each other instead of cutting hard. The spark blooms as each section arrives. */
 export function initBgMorph() {
-  const stage = document.querySelector('.bg-stage');
-  const grain = document.querySelector('.grain');
-  // not 'main > [data-bg]': pinned sections end up inside pin-spacers
-  const sections = [...document.querySelectorAll('main [data-bg]')];
-  document.documentElement.classList.add('bg-morph');
+  // 'main [data-bg]' (not 'main >'): pinned sections end up inside pin-spacers
+  const sections = [...document.querySelectorAll('main [data-bg], body > footer[data-bg]')];
+  sections.forEach((sec, i) => {
+    if (!i) return;
+    const prev = sections[i - 1].dataset.bg;
+    if (prev === sec.dataset.bg) return;
+    sec.style.setProperty('--blend-from', COLORS[prev]);
+    sec.classList.add('has-blend');
+  });
 
-  // Each section's natural top, measured from layout. A pinned section is
-  // measured by its pin-spacer, which keeps its place in the flow.
+  // spark bloom as each new section's top passes the middle of the screen
   let tops = [];
   const measure = () => {
     tops = sections.map((sec) => {
@@ -33,34 +38,20 @@ export function initBgMorph() {
       return box.getBoundingClientRect().top + scrollY;
     });
   };
-
-  // A single painter blends section colours in page order: the colour
-  // crosses over while a section's top travels from 85% to 35% of the viewport.
-  // Computed from scroll position alone, so fast jumps never leave a stale colour.
-  const mix = gsap.utils.interpolate;
   const bloomed = new Set();
   let lastY = -1;
-  const paint = (force) => {
-    const y = scrollY;
-    if (!force && y === lastY) return;
-    lastY = y;
-    const vh = innerHeight;
-    let c = COLORS[sections[0].dataset.bg], g = GRAIN[sections[0].dataset.bg];
+  const check = () => {
+    if (scrollY === lastY) return;
+    lastY = scrollY;
+    const mid = scrollY + innerHeight * 0.5;
     for (let i = 1; i < sections.length; i++) {
-      const p = clamp((y + vh * 0.85 - tops[i]) / (vh * 0.5), 0, 1);
-      if (p <= 0) break;
-      c = mix(c, COLORS[sections[i].dataset.bg], p);
-      g = mix(g, GRAIN[sections[i].dataset.bg], p);
-      // the spark gives a small bloom as each new section arrives
-      if (p > 0.6 && !bloomed.has(i)) { bloomed.add(i); spark.bloom(); }
+      if (mid < tops[i]) break;
+      if (!bloomed.has(i)) { bloomed.add(i); spark.bloom(); }
     }
-    stage.style.backgroundColor = c;
-    grain.style.opacity = g;
   };
   measure();
-  gsap.ticker.add(() => paint(false));
-  ScrollTrigger.addEventListener('refresh', () => { measure(); paint(true); });
-  paint(true);
+  gsap.ticker.add(check);
+  ScrollTrigger.addEventListener('refresh', measure);
 }
 
 /* ---------- Text reveals ---------- */

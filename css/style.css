@@ -38,7 +38,7 @@
 
 /* ---------- 2. Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 body {
@@ -73,13 +73,23 @@ section { position: relative; }
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
 
-/* Section themes. Without JS each section paints its own background;
-   with JS (.bg-morph) a single fixed layer morphs between them. */
+/* Section themes: every section paints its own solid colour. js/modules/motion.js
+   adds .has-blend + --blend-from so the top of each section melts in from the
+   previous section's colour (no hard cuts, and text always sits on its own colour). */
 [data-bg="cream"]  { background: var(--paper); }
 [data-bg="yellow"] { background: var(--yellow); }
 [data-bg="maroon"] { background: var(--maroon); }
-.bg-morph [data-bg] { background: transparent; }
+[data-bg].has-blend { isolation: isolate; }
+[data-bg].has-blend::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; z-index: -1; pointer-events: none;
+  height: clamp(90px, 16vh, 180px);
+  background: linear-gradient(var(--blend-from), color-mix(in srgb, var(--blend-from) 35%, transparent) 45%, transparent);
+}
 .theme-dark { color: var(--paper); }
+
+/* Sections with a max-width still paint their colour edge to edge */
+.seven, .approach, .different, .stories { box-shadow: 0 0 0 100vmax var(--paper); clip-path: inset(0 -100vmax); }
+.seven.has-blend::before, .approach.has-blend::before, .different.has-blend::before, .stories.has-blend::before { left: -100vmax; right: -100vmax; }
 
 /* ---------- 3. Type helpers ---------- */
 .display-lg, .display-md, .display-sm, .hero__title, .voice__title {
@@ -152,7 +162,7 @@ section { position: relative; }
 .bg-stage { position: fixed; inset: 0; z-index: 0; background: var(--maroon); pointer-events: none; }
 .no-js .bg-stage { display: none; }
 .grain {
-  position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: .5;
+  position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .38;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -222,7 +232,6 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
   padding: calc(var(--header-h) + 40px) var(--gutter) clamp(40px, 7vh, 90px);
   overflow: hidden; isolation: isolate; background: var(--maroon);
 }
-.bg-morph .hero { background: var(--maroon); }
 .hero__media { position: absolute; inset: 0; z-index: -1; }
 .hero__img, .hero__gl { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero__img { animation: breathe 14s ease-in-out infinite alternate; transform-origin: 60% 40%; }
@@ -287,7 +296,7 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
 }
 .split__grid {
   position: absolute; inset: 44px 0 0 14px; width: 900px;
-  font-family: var(--f-mono); font-size: 12.5px; line-height: 1.32; color: #6B6662; letter-spacing: -.02em;
+  font-family: var(--f-mono); font-size: 12.5px; line-height: 1.32; color: #57524E; letter-spacing: -.02em;
   white-space: nowrap; transform-origin: left top;
   transform: scale(calc(1 - var(--v) * .35));
 }
@@ -299,7 +308,7 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
 .split__tree .leaf--root { fill: var(--ink); }
 .split__tree .bud { fill: var(--yellow); stroke: var(--maroon); stroke-width: 1.5; }
 .split__label {
-  position: absolute; top: 12px; left: 14px; z-index: 2; font-weight: 700; font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: #6B6662;
+  position: absolute; top: 12px; left: 14px; z-index: 2; font-weight: 700; font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: #57524E;
 }
 .split__label--r { left: 20px; color: var(--maroon); }
 .split__seam { position: absolute; top: 0; bottom: 0; left: var(--seam); width: 0; z-index: 3; }
@@ -354,11 +363,11 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
   position: absolute; right: -16px; top: 22%; width: 132px; height: 132px; border-radius: 50%;
   display: grid; place-content: center; text-align: center; padding: 16px;
   border: 3px double var(--maroon); color: var(--maroon); background: rgba(249, 194, 18, .9);
-  font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: .72rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: .75rem;
   transform: rotate(-14deg) scale(0); opacity: 0;
   transition: transform .45s cubic-bezier(.3, 1.6, .5, 1) .25s, opacity .2s .25s;
 }
-.stamp em { display: block; font-style: normal; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: .7rem; line-height: 1.2; margin-top: 4px; }
+.stamp em { display: block; font-style: normal; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: .75rem; line-height: 1.2; margin-top: 4px; }
 .station.is-open .stamp { transform: rotate(-14deg) scale(1); opacity: 1; }
 
 /* ---------- 9. Cambridge Fit moment ---------- */
@@ -374,7 +383,7 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
 .results__stat { display: inline-flex; align-items: flex-end; gap: .14em; }
 .results__stat + .results__stat { padding-left: .45em; border-left: 3px solid rgba(151, 27, 30, .22); }
 .results__g { display: flex; flex-direction: column; font-family: var(--f-body); font-weight: 700; font-size: .34em; line-height: 1; padding-bottom: .16em; }
-.results__g small { font-size: .38em; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: .35em; }
+.results__g small { font-size: max(12px, .38em); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: .35em; }
 .results__lede { font-size: 1.25rem; font-weight: 500; margin: .4em 0 0; }
 .results__toss { transform: rotate(-3deg); margin: 0; grid-row: span 2; align-self: center; }
 .results__counter { margin: .2em 0 0; color: var(--muted); font-weight: 500; }
@@ -611,10 +620,10 @@ mark.is-marked { background-size: 100% 100%; }
 .orbit-map__eta { opacity: 0; transition: opacity .4s; pointer-events: none; }
 .orbit-map__eta.is-on { opacity: 1; }
 .orbit-map__eta rect { fill: var(--yellow); stroke: var(--maroon-deep); stroke-width: 3; }
-.orbit-map__eta text { font-family: var(--f-body); font-weight: 700; font-size: 24px; fill: var(--maroon-deep); }
+.orbit-map__eta text { font-family: var(--f-body); font-weight: 700; fill: var(--maroon-deep); }
 .orbit-map { position: relative; width: min(980px, 100%); aspect-ratio: 1; margin: 20px auto 0; }
 .orbit-map__svg { width: 100%; height: 100%; overflow: visible; }
-.road { fill: none; stroke: rgba(251, 245, 233, .14); stroke-width: 10; stroke-linecap: round; }
+.road { fill: none; stroke: rgba(251, 245, 233, .14); stroke-width: 10; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .road--thin { stroke-width: 5; }
 .road--orr { stroke: rgba(249, 194, 18, .16); stroke-width: 14; stroke-dasharray: 2 18; }
 .road--ring { stroke-width: 1.2; stroke: rgba(251, 245, 233, .16); stroke-dasharray: 4 8; }
@@ -687,7 +696,6 @@ mark.is-marked { background-size: 100% 100%; }
 
 /* ---------- 17. Footer ---------- */
 .footer { padding: 40px var(--gutter) 30px; color: var(--paper); background: var(--maroon-deep); }
-.bg-morph .footer { background: var(--maroon-deep); }
 .footer__grow { position: relative; max-width: var(--max); margin: 0 auto 50px; height: 200px; }
 .footer__line { position: absolute; left: 0; top: 40px; width: 90%; height: 120px; overflow: visible; }
 .footer__line path { fill: none; stroke: var(--yellow); stroke-width: 2.5; stroke-dasharray: 4 7; }
@@ -711,6 +719,40 @@ mark.is-marked { background-size: 100% 100%; }
 
 @media (max-width: 899px) {
   :root { --header-h: 62px; }
+
+  /* ---- mobile pass ---- */
+  .hero { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }   /* clear the sticky bar */
+  .site-header .btn--sm { min-height: 44px; }
+  .only-desktop { display: none; }
+  .footer__list a, .footer__base a { display: inline-block; padding: 11px 0; }
+  .site-header__logo { padding: 3px 0; }
+  .split__range { height: 44px; }
+  .approach__head em::after { inset: -4% -3% -10% -3%; }
+
+  /* Memorise vs Understand stacks vertically: memorise on top, the tree gets full width */
+  .split { --seam: calc(62% - var(--v) * 44%); }
+  .split__stage { height: 580px; }
+  .split__memo { inset: 0 0 auto 0; width: auto; height: var(--seam); border-right: 0; border-bottom: 2px solid var(--maroon); }
+  .split__grid { font-size: 12px; }
+  .split__understand { inset: var(--seam) 0 0 0; }
+  .split__tree { inset: 36px 8px 8px 8px; width: calc(100% - 16px); height: calc(100% - 44px); }
+  .split__label--r { top: 8px; }
+  .split__seam { top: var(--seam); bottom: auto; left: 0; right: 0; width: auto; height: 0; }
+  .split__knob { left: 50%; top: 0; }
+
+  .token { width: 46px; height: 46px; font-size: 1.15rem; }
+  .token--star b { font-size: .9rem; }
+
+  .prism-wrap { height: 44vh; }
+  .outcomes__pin { gap: 14px; }
+
+  /* the orbit map becomes a tall ellipse so every name fits the screen */
+  .orbit-map { width: 100%; margin-left: 0; aspect-ratio: 1000 / 1240; }
+  .orbit-map__mandala { width: 20%; }
+  .orbit-map__pin { top: calc(50% + 7.5%); }
+  .road { stroke-width: 4; }
+  .road--thin { stroke-width: 2; }
+  .road--orr { stroke-width: 6; stroke-dasharray: 1 8; }
   .site-nav { display: none; }
   .site-header__logo img { height: 38px; }
   .hero__note { display: none; }
@@ -721,7 +763,6 @@ mark.is-marked { background-size: 100% 100%; }
   .seven__num { width: 58%; margin: 0 auto; }
 
   .approach__head { grid-template-columns: 1fr; }
-  .split__grid { font-size: 10.5px; }
 
   /* Pathway becomes a vertical line */
   .pathway__pin { height: auto; overflow: visible; padding-bottom: 60px; }
@@ -774,7 +815,6 @@ mark.is-marked { background-size: 100% 100%; }
   .prop--sticky { position: relative; right: auto; top: auto; align-self: flex-end; order: 3; }
 
   .location__head, .location__real { grid-template-columns: 1fr; }
-  .orbit-map { width: 128%; margin-left: -14%; }
 
   .ticket { grid-template-columns: 1fr; grid-template-rows: auto 24px auto; }
   .ticket__main { grid-template-columns: 1fr; border-radius: 14px 14px 0 0; }

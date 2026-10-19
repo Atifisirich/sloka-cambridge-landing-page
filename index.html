@@ -6,6 +6,7 @@
   <title>Sloka International School Manneguda | Cambridge School in Hyderabad (Early Years to A Levels)</title>
   <meta name="description" content="Sloka International School, Manneguda: a Cambridge curriculum school in Hyderabad from Early Years to IGCSE and AS &amp; A Levels. Close to home for families in Hastinapuram, BN Reddy Nagar, Chintalkunta and Sagar Ring Road. Book a campus visit.">
   <meta name="theme-color" content="#971B1E">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://www.example.com/manneguda/"><!-- TODO: replace with the live URL -->
 
   <!-- Open Graph -->
@@ -18,11 +19,14 @@
   <!-- Fonts: Gloock (display), Mukta (body), Caveat (handwritten accents) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Gloock&family=Mukta:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Non-blocking font load: the page paints immediately with fallbacks, then swaps -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Gloock&family=Mukta:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Gloock&family=Mukta:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Gloock&family=Mukta:wght@400;500;700&display=swap"></noscript>
 
   <!-- Hero image is the LCP: preload the right size -->
   <link rel="preload" as="image" href="assets/img/hero-campus-800.webp"
-        imagesrcset="assets/img/hero-campus-800.webp 800w, assets/img/hero-campus-1600.webp 1536w" imagesizes="100vw" fetchpriority="high">
+        imagesrcset="assets/img/hero-campus-480.webp 480w, assets/img/hero-campus-800.webp 800w, assets/img/hero-campus-1600.webp 1536w" imagesizes="(max-width: 899px) 60vw, 100vw" fetchpriority="high">
 
   <link rel="stylesheet" href="css/style.css">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
@@ -91,7 +95,7 @@
   <!-- ================= LOADER ================= -->
   <div class="loader" aria-hidden="true">
     <div class="loader__mandala mandala" data-mandala="dark"></div>
-    <img class="loader__logo" src="assets/brand/sloka-logo.png" alt="" width="180" height="60">
+    <img class="loader__logo" src="assets/brand/sloka-logo-320.webp" srcset="assets/brand/sloka-logo-320.webp 320w, assets/brand/sloka-logo-640.webp 640w" sizes="150px" alt="" width="320" height="113">
   </div>
 
   <!-- Spark companion (cursor follower on desktop, scroll rider on touch) -->
@@ -103,7 +107,7 @@
   <!-- ================= HEADER ================= -->
   <header class="site-header">
     <a class="site-header__logo" href="#top" aria-label="Sloka International School, back to top">
-      <img src="assets/brand/sloka-logo.png" alt="Sloka International School" height="44">
+      <img src="assets/brand/sloka-logo-320.webp" srcset="assets/brand/sloka-logo-320.webp 320w, assets/brand/sloka-logo-640.webp 640w" sizes="150px" width="320" height="113" alt="Sloka International School">
     </a>
     <nav class="site-nav" aria-label="Main">
       <a href="#approach">Approach</a>
@@ -121,7 +125,7 @@
     <section class="hero theme-dark" id="top" data-bg="maroon" aria-labelledby="hero-title">
       <div class="hero__media">
         <img class="hero__img" src="assets/img/hero-campus-800.webp"
-             srcset="assets/img/hero-campus-800.webp 800w, assets/img/hero-campus-1600.webp 1536w" sizes="100vw"
+             srcset="assets/img/hero-campus-480.webp 480w, assets/img/hero-campus-800.webp 800w, assets/img/hero-campus-1600.webp 1536w" sizes="(max-width: 899px) 60vw, 100vw"
              width="1536" height="1024" fetchpriority="high" decoding="async"
              alt="The Sloka International School building in Manneguda at sunrise, its yellow facade glowing.">
         <canvas class="hero__gl" aria-hidden="true"></canvas>
@@ -223,7 +227,7 @@
                 <span class="station__dot" aria-hidden="true"></span>
                 <span class="station__code">01</span>
                 <article class="station__card">
-                  <figure class="station__img"><img src="assets/img/early-years-800.webp" width="800" height="451" loading="lazy" decoding="async" alt="Early Years children building a tower from coloured wooden blocks."></figure>
+                  <figure class="station__img"><img src="assets/img/early-years-800.webp" srcset="assets/img/early-years-480.webp 480w, assets/img/early-years-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="451" loading="lazy" decoding="async" alt="Early Years children building a tower from coloured wooden blocks."></figure>
                   <h3>Early Years</h3>
                   <p>Play, stories and wonder. Children build language, number sense and the confidence to try.</p>
                 </article>
@@ -232,7 +236,7 @@
                 <span class="station__dot" aria-hidden="true"></span>
                 <span class="station__code">02</span>
                 <article class="station__card">
-                  <figure class="station__img"><img src="assets/img/classroom-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="A Primary student presenting his smart irrigation project to classmates."></figure>
+                  <figure class="station__img"><img src="assets/img/classroom-800.webp" srcset="assets/img/classroom-480.webp 480w, assets/img/classroom-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="A Primary student presenting his smart irrigation project to classmates."></figure>
                   <h3>Primary <small>Checkpoint at Stage 6</small></h3>
                   <p>Strong foundations in English, Maths and Science, with AI classes from Stage 2.</p>
                   <span class="stamp" aria-label="Checkpoint: international benchmark in English, Maths and Science">Checkpoint<em>International benchmark in English, Maths and Science.</em></span>
@@ -242,7 +246,7 @@
                 <span class="station__dot" aria-hidden="true"></span>
                 <span class="station__code">03</span>
                 <article class="station__card">
-                  <figure class="station__img"><img src="assets/img/steam-lab-800.webp" width="800" height="451" loading="lazy" decoding="async" alt="Three Lower Secondary students building a robot car in the STEAM lab."></figure>
+                  <figure class="station__img"><img src="assets/img/steam-lab-800.webp" srcset="assets/img/steam-lab-480.webp 480w, assets/img/steam-lab-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="451" loading="lazy" decoding="async" alt="Three Lower Secondary students building a robot car in the STEAM lab."></figure>
                   <h3>Lower Secondary <small>Checkpoint at Stage 9</small></h3>
                   <p>Deeper subject thinking, projects and independent enquiry.</p>
                   <span class="stamp" aria-label="Checkpoint: international benchmark in English, Maths and Science">Checkpoint<em>International benchmark in English, Maths and Science.</em></span>
@@ -252,7 +256,7 @@
                 <span class="station__dot" aria-hidden="true"></span>
                 <span class="station__code">04</span>
                 <article class="station__card">
-                  <figure class="station__img"><img src="assets/img/debate-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="Two students debating at podiums during the Sloka Dealathon."></figure>
+                  <figure class="station__img"><img src="assets/img/debate-800.webp" srcset="assets/img/debate-480.webp 480w, assets/img/debate-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="Two students debating at podiums during the Sloka Dealathon."></figure>
                   <h3>IGCSE</h3>
                   <p>Flexible subject choices and an internationally recognised qualification.</p>
                 </article>
@@ -261,7 +265,7 @@
                 <span class="station__dot" aria-hidden="true"></span>
                 <span class="station__code">05</span>
                 <article class="station__card">
-                  <figure class="station__img"><img src="assets/img/senior-students-800.webp" width="800" height="1000" loading="lazy" decoding="async" alt="Senior students in Grades 11 and 12. Placeholder photo."></figure>
+                  <figure class="station__img"><img src="assets/img/senior-students-800.webp" srcset="assets/img/senior-students-480.webp 480w, assets/img/senior-students-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="1000" loading="lazy" decoding="async" alt="Senior students in Grades 11 and 12. Placeholder photo."></figure>
                   <h3>AS &amp; A Levels <small>Grades 11–12</small></h3>
                   <p>Specialise in the subjects that lead to your child's chosen university path.</p>
                 </article>
@@ -324,17 +328,17 @@
 
       <div class="voice__panels">
         <article class="vpanel vpanel--a">
-          <figure class="vpanel__img" data-reveal="bloom"><img data-skew src="assets/img/assembly-speaking-800.webp" srcset="assets/img/assembly-speaking-800.webp 800w, assets/img/assembly-speaking-1600.webp 1600w" sizes="(min-width: 900px) 45vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="A young student in a Sloka blazer speaking confidently into a microphone at an outdoor assembly."></figure>
+          <figure class="vpanel__img" data-reveal="bloom"><img data-skew src="assets/img/assembly-speaking-800.webp" srcset="assets/img/assembly-speaking-480.webp 480w, assets/img/assembly-speaking-800.webp 800w, assets/img/assembly-speaking-1600.webp 1600w" sizes="(min-width: 900px) 45vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="A young student in a Sloka blazer speaking confidently into a microphone at an outdoor assembly."></figure>
           <h3>Tiny Talkers</h3>
           <p>Public speaking from the youngest years.</p>
         </article>
         <article class="vpanel vpanel--b">
-          <figure class="vpanel__img" data-reveal="tear"><img data-skew src="assets/img/debate-800.webp" srcset="assets/img/debate-800.webp 800w, assets/img/debate-1600.webp 1600w" sizes="(min-width: 900px) 40vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="Two students facing each other at podiums on the Dealathon stage."></figure>
+          <figure class="vpanel__img" data-reveal="tear"><img data-skew src="assets/img/debate-800.webp" srcset="assets/img/debate-480.webp 480w, assets/img/debate-800.webp 800w, assets/img/debate-1600.webp 1600w" sizes="(min-width: 900px) 40vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="Two students facing each other at podiums on the Dealathon stage."></figure>
           <h3>Sloka Dealathon</h3>
           <p>Students debate, negotiate and decide.</p>
         </article>
         <article class="vpanel vpanel--c">
-          <figure class="vpanel__img" data-reveal="ink"><img data-skew src="assets/img/students-group-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="Students at a speaking-focused assembly. Placeholder photo."></figure>
+          <figure class="vpanel__img" data-reveal="ink"><img data-skew src="assets/img/students-group-800.webp" srcset="assets/img/students-group-480.webp 480w, assets/img/students-group-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="Students at a speaking-focused assembly. Placeholder photo."></figure>
           <h3>Speaking-focused assemblies</h3>
           <p>Every child gets the stage.</p>
         </article>
@@ -359,7 +363,7 @@
         <!-- STEAM Lab -->
         <article class="tile tile--steam" tabindex="0">
           <div class="tile__media" data-particles>
-            <img src="assets/img/steam-lab-800.webp" srcset="assets/img/steam-lab-800.webp 800w, assets/img/steam-lab-1600.webp 1600w" sizes="(min-width: 900px) 50vw, 92vw" width="1600" height="901" loading="lazy" decoding="async" alt="Students wiring a robot car in the Sloka STEAM Lab.">
+            <img src="assets/img/steam-lab-800.webp" srcset="assets/img/steam-lab-480.webp 480w, assets/img/steam-lab-800.webp 800w, assets/img/steam-lab-1600.webp 1600w" sizes="(min-width: 900px) 50vw, 92vw" width="1600" height="901" loading="lazy" decoding="async" alt="Students wiring a robot car in the Sloka STEAM Lab.">
           </div>
           <div class="tile__body">
             <h3 class="tile__title">STEAM Lab</h3>
@@ -379,14 +383,14 @@
 
         <!-- Sports -->
         <article class="tile tile--sports" tabindex="0">
-          <figure class="tile__media" data-reveal="tear"><img data-skew src="assets/img/sports-800.webp" srcset="assets/img/sports-800.webp 800w, assets/img/sports-1600.webp 1600w" sizes="(min-width: 900px) 40vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="Students playing basketball on the school court."></figure>
+          <figure class="tile__media" data-reveal="tear"><img data-skew src="assets/img/sports-800.webp" srcset="assets/img/sports-480.webp 480w, assets/img/sports-800.webp 800w, assets/img/sports-1600.webp 1600w" sizes="(min-width: 900px) 40vw, 92vw" width="1600" height="900" loading="lazy" decoding="async" alt="Students playing basketball on the school court."></figure>
           <h3 class="tile__title">Adventure sports, skating, karate, swimming</h3>
         </article>
 
         <!-- Swimming (ripple shader) -->
         <article class="tile tile--swim" tabindex="0">
           <div class="tile__media" data-ripple>
-            <img src="assets/img/swimming-800.webp" width="800" height="600" loading="lazy" decoding="async" alt="Students in the swimming pool. Placeholder photo.">
+            <img src="assets/img/swimming-800.webp" srcset="assets/img/swimming-480.webp 480w, assets/img/swimming-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="600" loading="lazy" decoding="async" alt="Students in the swimming pool. Placeholder photo.">
           </div>
           <p class="tile__tag">Swimming</p>
         </article>
@@ -394,7 +398,7 @@
         <!-- Skating (glides with scroll velocity) -->
         <article class="tile tile--skate" tabindex="0">
           <div class="tile__media tile__glide" data-glide>
-            <img src="assets/img/skating-karate-800.webp" width="800" height="533" loading="lazy" decoding="async" alt="A young student roller skating in full safety gear.">
+            <img src="assets/img/skating-karate-800.webp" srcset="assets/img/skating-karate-480.webp 480w, assets/img/skating-karate-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="533" loading="lazy" decoding="async" alt="A young student roller skating in full safety gear.">
           </div>
           <p class="tile__tag">Skating &amp; karate</p>
         </article>
@@ -402,7 +406,7 @@
         <!-- Art & Music (paint splash reveal) -->
         <article class="tile tile--art" tabindex="0">
           <div class="tile__media splash" data-splash>
-            <img src="assets/img/art-music-800.webp" width="800" height="600" loading="lazy" decoding="async" alt="Students painting and playing music. Placeholder photo.">
+            <img src="assets/img/art-music-800.webp" srcset="assets/img/art-music-480.webp 480w, assets/img/art-music-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="600" loading="lazy" decoding="async" alt="Students painting and playing music. Placeholder photo.">
           </div>
           <h3 class="tile__title">Art &amp; Music</h3>
         </article>
@@ -433,23 +437,23 @@
         <div class="prism-wrap">
           <div class="prism" data-prism>
             <figure class="prism__face">
-              <img src="assets/img/assembly-speaking-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="A student speaking at an assembly.">
+              <img src="assets/img/assembly-speaking-800.webp" srcset="assets/img/assembly-speaking-480.webp 480w, assets/img/assembly-speaking-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="A student speaking at an assembly.">
               <figcaption><strong>Confident</strong><span>Speaking on stage, from Tiny Talkers to Dealathon.</span></figcaption>
             </figure>
             <figure class="prism__face">
-              <img src="assets/img/early-years-800.webp" width="800" height="451" loading="lazy" decoding="async" alt="Young children building together and sharing blocks.">
+              <img src="assets/img/early-years-800.webp" srcset="assets/img/early-years-480.webp 480w, assets/img/early-years-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="451" loading="lazy" decoding="async" alt="Young children building together and sharing blocks.">
               <figcaption><strong>Responsible</strong><span>Care Club, values and looking out for one another.</span></figcaption>
             </figure>
             <figure class="prism__face">
-              <img src="assets/img/classroom-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="A student explaining his project while classmates listen.">
+              <img src="assets/img/classroom-800.webp" srcset="assets/img/classroom-480.webp 480w, assets/img/classroom-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="A student explaining his project while classmates listen.">
               <figcaption><strong>Reflective</strong><span>Learning to ask what worked, and why.</span></figcaption>
             </figure>
             <figure class="prism__face">
-              <img src="assets/img/steam-lab-800.webp" width="800" height="451" loading="lazy" decoding="async" alt="Students building a robot.">
+              <img src="assets/img/steam-lab-800.webp" srcset="assets/img/steam-lab-480.webp 480w, assets/img/steam-lab-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="451" loading="lazy" decoding="async" alt="Students building a robot.">
               <figcaption><strong>Innovative</strong><span>AI classes and STEAM projects from Stage 2.</span></figcaption>
             </figure>
             <figure class="prism__face">
-              <img src="assets/img/sports-800.webp" width="800" height="450" loading="lazy" decoding="async" alt="Students playing basketball together.">
+              <img src="assets/img/sports-800.webp" srcset="assets/img/sports-480.webp 480w, assets/img/sports-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="450" loading="lazy" decoding="async" alt="Students playing basketball together.">
               <figcaption><strong>Engaged</strong><span>On the court, on the rink and on the stage.</span></figcaption>
             </figure>
           </div>
@@ -465,7 +469,7 @@
         <div class="letter" data-letter>
           <div class="letter__panel letter__panel--top">
             <div class="letter__face">
-              <figure class="letter__portrait"><img src="assets/img/principal-800.webp" width="800" height="1000" loading="lazy" decoding="async" alt="Portrait of Fathima Shabanam Z, Principal and COO. Placeholder photo."></figure>
+              <figure class="letter__portrait"><img src="assets/img/principal-800.webp" srcset="assets/img/principal-480.webp 480w, assets/img/principal-800.webp 800w" sizes="(max-width: 899px) 90vw, 30vw" width="800" height="1000" loading="lazy" decoding="async" alt="Portrait of Fathima Shabanam Z, Principal and COO. Placeholder photo."></figure>
               <p class="letter__from hand">from the Principal's desk</p>
               <p class="letter__line letter__salute">Dear Parents,</p>
               <p class="letter__line">At Sloka International School, Manneguda, we believe every child is born with a unique spark. Our role is to help that spark grow into confidence, curiosity and character.</p>
@@ -495,7 +499,7 @@
                     <path class="signature__pen" d="M302 548 C240 430 150 270 100 205 C80 185 72 215 92 262 C140 370 230 490 300 548 L312 470 L360 460 L405 432 L440 402 C490 410 505 470 470 520 C430 565 350 575 305 552 M440 402 L410 330 L412 250 M335 318 C330 280 380 215 420 182 C460 210 505 280 525 362 C560 315 600 280 640 238 C690 205 730 190 760 152 C780 125 800 110 818 104 L520 420 L320 668 M312 676 L620 400 L910 116 L852 212 M803 352 L806 356 M684 428 L700 420"/>
                   </mask>
                 </defs>
-                <image href="assets/brand/principal-signature.png" width="1139" height="802" filter="url(#sigInk)" mask="url(#sigPen)"/>
+                <image href="assets/brand/principal-signature.webp" width="1139" height="802" filter="url(#sigInk)" mask="url(#sigPen)"/>
               </svg>
               <p class="letter__sign"><strong>Fathima Shabanam Z</strong><br>Principal &amp; COO, Sloka Group of Schools</p>
               </div>
@@ -509,11 +513,11 @@
     <section class="stories" id="stories" data-bg="cream" aria-labelledby="stories-title">
       <div class="stories__head">
         <h2 class="display-md" id="stories-title" data-split>Letters we keep on our desk.</h2>
-        <p class="hand">drag them around · tap one to read it</p>
+        <p class="hand"><span class="only-desktop">drag them around · </span>tap one to read it</p>
       </div>
 
       <div class="desk" data-desk>
-        <article class="note note--letter" style="--r:-4deg; --x:6%; --y:8%" tabindex="0" role="button" aria-haspopup="dialog" aria-controls="noteDialog" data-note="1">
+        <div class="note note--letter" style="--r:-4deg; --x:6%; --y:8%" tabindex="0" role="button" aria-haspopup="dialog" aria-controls="noteDialog" data-note="1">
           <p class="note__quote">“We are truly amazed by the <mark>progress he has made</mark> in such a short time.”</p>
           <p class="note__by">Sai Krishna &amp; Vidhyadhari<br><span>Parents of Aarav Karti Voothaluru, Stage 3 Elites</span></p>
           <template>
@@ -523,9 +527,9 @@
             <p>We are grateful to his teachers for <mark>building ethics, values and character</mark> alongside his studies. We are extremely happy that we chose Sloka International, Manneguda.</p>
             <p class="hand">Sai Krishna &amp; Vidhyadhari<br>Parents of Aarav Karti Voothaluru, Stage 3 Elites</p>
           </template>
-        </article>
+        </div>
 
-        <article class="note note--card" style="--r:5deg; --x:52%; --y:16%" tabindex="0" role="button" aria-haspopup="dialog" aria-controls="noteDialog" data-note="2">
+        <div class="note note--card" style="--r:5deg; --x:52%; --y:16%" tabindex="0" role="button" aria-haspopup="dialog" aria-controls="noteDialog" data-note="2">
           <p class="note__quote">“It is reassuring to see a school that <mark>genuinely values parents' perspectives</mark>.”</p>
           <p class="note__by">Parents of Shanmukha and Srinika</p>
           <template>
@@ -535,7 +539,7 @@
             <p>The PTMs are insightful, and the school is receptive to parents' suggestions. It is reassuring to see a school that genuinely values parents' perspectives.</p>
             <p class="hand">Parents of Shanmukha and Srinika</p>
           </template>
-        </article>
+        </div>
 
         <!-- Desk props (decorative) -->
         <div class="prop prop--pencil" aria-hidden="true"></div>
@@ -705,7 +709,7 @@
 
     <div class="footer__grid">
       <div class="footer__brand">
-        <img src="assets/brand/sloka-logo.png" alt="Sloka International School" height="64" loading="lazy">
+        <img src="assets/brand/sloka-logo-640.webp" width="640" height="225" alt="Sloka International School" loading="lazy">
         <p>Cambridge curriculum, Early Years to AS &amp; A Levels, in Manneguda, Hyderabad.</p>
         <a class="compass compass--footer" data-cambridge-link href="[PASTE_CAMBRIDGE_LINK_HERE]" target="_blank" rel="noopener">
           <span class="compass__dial" aria-hidden="true"></span>
@@ -740,8 +744,9 @@
   </footer>
 
   <!-- Mobile: sticky compass badge (bottom-left) + Enquire Now bar -->
-  <a class="compass compass--float" data-cambridge-link href="[PASTE_CAMBRIDGE_LINK_HERE]" target="_blank" rel="noopener" aria-label="Is Cambridge right for my child? Find out (opens in a new tab)">
+  <a class="compass compass--float" data-cambridge-link href="[PASTE_CAMBRIDGE_LINK_HERE]" target="_blank" rel="noopener">
     <span class="compass__dial" aria-hidden="true"></span>
+    <span class="visually-hidden">Is Cambridge right for my child? Find out (opens in a new tab)</span>
   </a>
   <div class="mobile-bar">
     <a class="btn btn--yellow" href="#enquiry-form">Enquire Now</a>

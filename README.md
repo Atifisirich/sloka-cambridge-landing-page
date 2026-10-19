@@ -81,4 +81,5 @@ For WebGL I used a small hand-written helper (`gl.js`) instead of Three.js/OGL. 
 - `prefers-reduced-motion`: no loader bloom, no smooth scroll, no pinning effects. The prism lays flat, every station is open and reveals become simple fades.
 - If the CDN fails, the page stays fully readable with no motion. The form still works on its own.
 - Every toy has static content in the DOM: the slider has a text summary, the physics section has its headline and a token grid, and the map has a hidden list of areas.
-- Lighthouse has not been run yet. Run it against the deployed build with real photos and logo in place.
+- **Mobile Lighthouse** (local, gzip on, simulated slow 4G + mid-range phone): Performance 96, Accessibility 100, Best Practices 96, SEO 100. LCP 2.6–2.7 s, CLS 0.02, TBT ≈ 0 ms. The only Best Practices miss is the missing Cambridge badge file (404). Re-run on the live URL once the badge and real photos are in.
+- Phones get: 480px images, WebP logo/signature, non-blocking fonts, a quicker loader, below-the-fold set-up deferred until the loader opens, a stacked memorise/understand split, an elliptical map with collision-free labels, ≥44px tap targets and ≥12px text.

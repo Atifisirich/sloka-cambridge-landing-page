@@ -24,10 +24,20 @@ export function initOrbitMap() {
   const result = document.querySelector('.location__result');
   const note = document.querySelector('.location__note');
 
+  // Phones: the orbit becomes a tall ellipse (narrow x, stretched y) with larger
+  // names, so every label fits the width of the screen and stays readable.
+  const SX = env.mobile ? 0.6 : 1, SY = env.mobile ? 1.1 : 1;
+  const sizes = env.mobile ? [42, 38, 35] : SIZES;
+  if (env.mobile) {
+    wrap.querySelector('.orbit-map__svg').setAttribute('viewBox', '-500 -620 1000 1240');
+    wrap.querySelector('.orbit-map__roads').setAttribute('transform', `scale(${SX} ${SY})`);
+  }
+
   // time tag that sits at the middle of the route line
   const eta = document.createElementNS(NS, 'g');
   eta.setAttribute('class', 'orbit-map__eta');
-  eta.innerHTML = '<rect height="44" rx="22"/><text text-anchor="middle" dominant-baseline="central"></text>';
+  const ETA_H = env.mobile ? 74 : 44; // phones: the map is drawn smaller, so the tag is drawn bigger
+  eta.innerHTML = `<rect height="${ETA_H}" rx="${ETA_H / 2}"/><text text-anchor="middle" dominant-baseline="central" font-size="${env.mobile ? 40 : 24}"></text>`;
   route.after(eta);
   const etaRect = eta.querySelector('rect'), etaText = eta.querySelector('text');
   const minsLabel = (m) => (m ? `~${m[0]}–${m[1]} min` : '');
@@ -42,30 +52,74 @@ export function initOrbitMap() {
     dot.setAttribute('class', 'loc-dot');
     const text = document.createElementNS(NS, 'text');
     text.setAttribute('class', 'loc');
-    text.setAttribute('font-size', SIZES[l.ring]);
+    text.setAttribute('font-size', sizes[l.ring]);
     text.textContent = l.name;
     g.append(dot, text);
     return { ...l, dot, text, x: 0, y: 0, key: norm(l.name) };
   });
 
-  let spin = 0, spinSpeed = env.reduced ? 0 : 0.02, t = 0, visible = false, hit = null;
+  // Phones keep the names still (an ellipse doesn't rotate rigidly, so names would
+  // drift into each other); they "breathe" in and out instead. Larger screens orbit.
+  let spin = 0, spinSpeed = env.reduced || env.mobile ? 0 : 0.02, t = 0, visible = false, hit = null;
+
+  /* Nudge each name around its ring (closest free angle) until it overlaps
+     no other name and stays clear of the centre and the edges. Runs once fonts
+     are ready so text widths are real. Bearings stay roughly true ("not to scale"). */
+  const LIMIT_X = 490, LIMIT_Y = env.mobile ? 610 : 490;
+  function boxAt(it, angle, radius) {
+    const a = (angle * Math.PI) / 180;
+    const x = Math.sin(a) * radius * SX, y = -Math.cos(a) * radius * SY;
+    const size = sizes[it.ring], w = it.w || it.name.length * size * 0.5;
+    const right = Math.sin(a) >= 0;
+    const x0 = right ? x - 6 : x - 14 - w, x1 = right ? x + 14 + w : x + 6;
+    return { x0, x1, y0: y - size * 0.72, y1: y + size * 0.42 };
+  }
+  const hits = (p, q, pad = 8) => p.x0 < q.x1 + pad && q.x0 < p.x1 + pad && p.y0 < q.y1 + pad && q.y0 < p.y1 + pad;
+  function layout() {
+    items.forEach((it) => { it.w = it.text.getComputedTextLength() || 0; });
+    // keep clear of the mandala and the "Sloka, Manneguda" pin (drawn larger, relatively, on phones)
+    const centre = env.mobile ? { x0: -225, x1: 225, y0: -150, y1: 160 } : { x0: -150, x1: 150, y0: -140, y1: 200 };
+    const placed = [];
+    [...items].sort((p, q) => p.ring - q.ring).forEach((it) => {
+      const home = RINGS[it.ring];
+      // closest free spot: same ring first, then slightly in/out, up to ±92° around
+      for (const radius of [home, home + 55, home - 55, home + 100]) {
+        for (let step = 0; step <= 46; step++) {
+          const d = step === 0 ? 0 : Math.ceil(step / 2) * 4 * (step % 2 ? 1 : -1);
+          const box = boxAt(it, it.baseAngle + d, radius);
+          const inside = box.x0 > -LIMIT_X && box.x1 < LIMIT_X && box.y0 > -LIMIT_Y && box.y1 < LIMIT_Y;
+          if (inside && !hits(box, centre) && !placed.some((b) => hits(box, b))) {
+            it.angle = it.baseAngle + d;
+            it.radius = radius;
+            placed.push(box);
+            return;
+          }
+        }
+      }
+      it.radius = home; // no free slot anywhere: keep its bearing
+      placed.push(boxAt(it, it.angle, home));
+    });
+  }
+  items.forEach((it) => { it.baseAngle = it.angle; it.radius = RINGS[it.ring]; });
 
   function place() {
     items.forEach((it, i) => {
-      const breathe = env.reduced ? 0 : Math.sin(t * 0.8 + it.ring * 1.4) * 8;
-      const r = RINGS[it.ring] + breathe;
+      const breathe = env.reduced ? 0 : Math.sin(t * 0.8 + it.ring * 1.4) * (env.mobile ? 4 : 8);
+      const r = it.radius + breathe;
       const a = ((it.angle + spin) * Math.PI) / 180;
-      it.x = Math.sin(a) * r;
-      it.y = -Math.cos(a) * r;
+      it.x = Math.sin(a) * r * SX;
+      it.y = -Math.cos(a) * r * SY;
       const right = Math.sin(a) >= 0;
       it.dot.setAttribute('cx', it.x.toFixed(1));
       it.dot.setAttribute('cy', it.y.toFixed(1));
       it.text.setAttribute('x', (it.x + (right ? 10 : -10)).toFixed(1));
-      it.text.setAttribute('y', (it.y + SIZES[it.ring] * 0.33).toFixed(1));
+      it.text.setAttribute('y', (it.y + sizes[it.ring] * 0.33).toFixed(1));
       it.text.setAttribute('text-anchor', right ? 'start' : 'end');
     });
   }
+  layout();
   place();
+  document.fonts?.ready.then(() => { layout(); place(); });
 
   visibility(wrap, (v) => (visible = v));
   if (!env.reduced) {
@@ -114,9 +168,9 @@ export function initOrbitMap() {
       // wait for the orbit to settle, then draw the route
       eta.classList.remove('is-on');
       etaText.textContent = minsLabel(match.mins);
-      const w = etaText.getComputedTextLength() + 40;
+      const w = etaText.getComputedTextLength() + ETA_H;
       etaRect.setAttribute('x', -w / 2);
-      etaRect.setAttribute('y', -22);
+      etaRect.setAttribute('y', -ETA_H / 2);
       etaRect.setAttribute('width', w);
       settleTimer = setTimeout(() => {
         drawRoute(match, true);

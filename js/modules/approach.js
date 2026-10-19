@@ -11,15 +11,15 @@ const FACT = 'Plants make food from sunlight. ';
 
 // Tree: [id, parent, x, y, label, size, appearsAt]
 const NODES = [
-  ['root', null, 300, 405, 'plants make food', 22, 0],
-  ['why', 'root', 150, 300, 'Why?', 34, 0.18],
-  ['whatif', 'root', 455, 290, 'What if?', 34, 0.28],
-  ['connect', 'root', 305, 215, 'How does it connect?', 24, 0.42],
-  ['green', 'why', 70, 175, 'Why are leaves green?', 18, 0.55],
-  ['nosun', 'whatif', 520, 165, 'What if there were no sun?', 18, 0.6],
-  ['eat', 'connect', 215, 95, 'Is my lunch sunlight?', 20, 0.72],
-  ['test', 'connect', 410, 70, 'Can we test it?', 22, 0.82],
-  ['oxygen', 'green', 95, 40, 'Where does the oxygen go?', 17, 0.9]
+  ['root', null, 300, 405, 'plants make food', 26, 0],
+  ['why', 'root', 150, 300, 'Why?', 38, 0.18],
+  ['whatif', 'root', 455, 290, 'What if?', 38, 0.28],
+  ['connect', 'root', 305, 215, 'How does it connect?', 28, 0.42],
+  ['green', 'why', 125, 170, 'Why are leaves green?', 23, 0.55],
+  ['nosun', 'whatif', 455, 160, 'What if there were no sun?', 23, 0.6],
+  ['eat', 'connect', 215, 95, 'Is my lunch sunlight?', 24, 0.72],
+  ['test', 'connect', 440, 72, 'Can we test it?', 26, 0.82],
+  ['oxygen', 'green', 165, 38, 'Where does the oxygen go?', 22, 0.9]
 ];
 
 export function initApproach() {

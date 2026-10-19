@@ -54,36 +54,46 @@ if (!env.hasLibs) {
   ScrollTrigger.config({ ignoreMobileResize: true });
   if (env.touch) root.classList.add('is-touch');
 
+  // First paint only needs the hero and the loader...
   initSmooth();
   const hero = initHero();
   const intro = heroIntro(hero);
   initCompasses();
-  initSeven();
-  initApproach();
-  initPathway();          // pin #1
-  initResults();
-  initVoice();
-  initBento();
-  initPrism();            // pin #2
-  initLetter();
-  initStories();
-  initOrbitMap();
-  initImageReveals();
-  initSkew();
-  initChrome();
-  initFooter();
 
-  // line-based effects need final font metrics
-  const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]) : Promise.resolve();
-  fontsReady.then(() => {
-    initTextReveals();
-    initBgMorph();
-    ScrollTrigger.sort();
-    ScrollTrigger.refresh();
-  });
+  // ...everything below the fold is set up once the loader opens, so a phone's
+  // CPU is free for the first seconds. Order matters: pins are created top-to-bottom.
+  let setUp = false;
+  const setUpPage = () => {
+    if (setUp) return;
+    setUp = true;
+    initSeven();
+    initApproach();
+    initPathway();          // pin #1
+    initResults();
+    initVoice();
+    initBento();
+    initPrism();            // pin #2
+    initLetter();           // pin #3 (laptops/desktops)
+    initStories();
+    initOrbitMap();
+    initImageReveals();
+    initSkew();
+    initChrome();
+    initFooter();
+
+    // line-based effects need final font metrics
+    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]) : Promise.resolve();
+    fontsReady.then(() => {
+      initTextReveals();
+      initBgMorph();
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+    });
+  };
 
   root.classList.add('is-ready');
-  runLoader().then(() => intro.play());
+  runLoader().then(() => { intro.play(); setTimeout(setUpPage, 0); });
+  setTimeout(setUpPage, 6000); // safety net if the loader never resolves
 
   // the spark celebrates a sent enquiry (event from js/enquiry-form.js)
   document.addEventListener('sloka:enquiry-sent', () => spark.bloom(2));

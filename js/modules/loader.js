@@ -23,7 +23,7 @@ export function runLoader() {
 
   let seen = false;
   try { seen = sessionStorage.getItem('sloka-seen') === '1'; sessionStorage.setItem('sloka-seen', '1'); } catch (e) { /* storage blocked */ }
-  const speed = seen ? 2.4 : 1;
+  const speed = seen ? 2.4 : env.mobile ? 1.6 : 1; // phones get a quicker bloom
 
   stopScroll(true);
   scrollTo(0, 0);
