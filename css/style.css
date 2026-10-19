@@ -238,12 +238,16 @@ html:not(.is-ready) .loader { animation: loaderBail .6s 6s forwards; }
 .hero__gl { opacity: 0; transition: opacity 1s; }
 .hero.gl-on .hero__gl { opacity: 1; }
 @keyframes breathe { from { transform: scale(1.02); } to { transform: scale(1.1); } }
+/* A neutral, warm-dark scrim only where the text sits (bottom-left) plus a light
+   one under the header, so the building photo keeps its own colours. */
 .hero__shade {
   position: absolute; inset: 0;
   background:
-    linear-gradient(to top, rgba(118, 21, 24, .94) 0%, rgba(118, 21, 24, .72) 34%, rgba(118, 21, 24, .18) 66%, rgba(26, 17, 16, .25) 100%),
-    linear-gradient(to right, rgba(118, 21, 24, .55), transparent 60%);
+    linear-gradient(to top, rgba(26, 17, 16, .78) 0%, rgba(26, 17, 16, .5) 28%, rgba(26, 17, 16, 0) 60%),
+    linear-gradient(to right, rgba(26, 17, 16, .55) 0%, rgba(26, 17, 16, .32) 38%, rgba(26, 17, 16, 0) 66%),
+    linear-gradient(to bottom, rgba(26, 17, 16, .35), transparent 20%);
 }
+.hero__title, .hero__sub { text-shadow: 0 2px 22px rgba(26, 17, 16, .45); }
 .hero__content { width: 100%; max-width: var(--max); margin: 0 auto; position: relative; }
 .hero__title {
   font-size: clamp(3rem, 1.4rem + 7.4vw, 9.6rem); line-height: .9; color: var(--paper);
@@ -756,6 +760,9 @@ mark.is-marked { background-size: 100% 100%; }
   .site-nav { display: none; }
   .site-header__logo img { height: 38px; }
   .hero__note { display: none; }
+  .hero__shade { background:
+    linear-gradient(to top, rgba(26, 17, 16, .84) 0%, rgba(26, 17, 16, .6) 46%, rgba(26, 17, 16, 0) 82%),
+    linear-gradient(to bottom, rgba(26, 17, 16, .35), transparent 18%); }
   .hero__ctas .compass { display: none; } /* compass lives in the floating badge on mobile */
   .hero__badge img { height: 44px; }
 
