@@ -5,7 +5,7 @@
 
 window.SLOKA_SITE = {
   // Cambridge Fit button: every [data-cambridge-link] on the page uses this.
-  CAMBRIDGE_FIT_URL: '[PASTE_CAMBRIDGE_LINK_HERE]',
+  CAMBRIDGE_FIT_URL: 'https://forms.gle/tTd3XyJwTcrBPHws8',
 
   // Contact details (shown in footer, location and schema). Replace placeholders.
   PHONE_DISPLAY: '+91 00000 00000',
