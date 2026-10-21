@@ -786,13 +786,28 @@ mark.is-marked { background-size: 100% 100%; }
 /* errors (their classes: .in-valid on the field, .error on the message) */
 #ee-form-8 .in-valid, #ee-form-8 .in-valid + .select2-container .select2-selection--single { border-color: #A3201C !important; box-shadow: 0 0 0 3px rgba(163, 32, 28, .15) !important; }
 #ee-form-8 .error { display: block; margin-top: 5px; color: #A3201C; font-size: .88rem; font-weight: 500; }
-/* captcha, consent, submit span the full ticket width */
-#ee-form-8 .captchaContainer, #ee-form-8 .check-box-field, #ee-form-8 .ee-form-footer { grid-column: 1 / -1; }
-#ee-form-8 .captchaContainer { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+/* captcha row, consent and submit span the full ticket width. The captcha row
+   (and the field just before it, so nothing is left half-empty) take a full row;
+   inside it the captcha box and "Enter Text" sit on the same two columns as the
+   fields above, both 52px tall and vertically centred. */
+#ee-form-8 .ee-row:has(> .captchaContainer), #ee-form-8 .ee-row:has(+ .ee-row > .captchaContainer),
+#ee-form-8 .check-box-field, #ee-form-8 .ee-form-footer { grid-column: 1 / -1; }
+#ee-form-8 .captchaContainer { display: grid !important; grid-template-columns: 1fr 1fr; gap: 22px; align-items: center; width: 100%; margin: 0 !important; }
 #ee-form-8 .captchaContainer .ee-row { margin: 0 !important; }
-#ee-form-8 .cpatcha { border: 1.5px solid rgba(26, 17, 16, .22) !important; border-radius: 10px; background: #fff; overflow: hidden; }
-#ee-form-8 .check-box-field label { display: flex; gap: 10px; align-items: flex-start; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: .98rem; color: var(--ink); cursor: pointer; }
-#ee-form-8 .check-box-field input[type="checkbox"] { width: 22px; height: 22px; margin: 2px 0 0 !important; flex: none; accent-color: var(--maroon); }
+#ee-form-8 .cpatcha {
+  display: flex !important; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100% !important; height: 52px !important; margin: 0 !important; padding: 0 8px 0 16px !important; box-sizing: border-box;
+  border: 1.5px solid rgba(26, 17, 16, .22) !important; border-radius: 10px; background: #fff; overflow: hidden;
+}
+#ee-form-8 .cpatcha canvas { display: block; margin: 0 auto 0 0; }
+#ee-form-8 .cpatcha .divider { align-self: stretch; height: auto !important; margin: 10px 0 !important; }
+#ee-form-8 .cpatcha .refreshButtonContainer { display: flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; border-radius: 8px; cursor: pointer; }
+#ee-form-8 .cpatcha .refreshButtonContainer:hover { background: var(--paper); }
+/* consent: checkbox and text centred on one line, readable size */
+#ee-form-8 .check-box-field { margin-top: 2px !important; }
+#ee-form-8 .check-box-field label { display: flex !important; gap: 12px; align-items: center; margin: 0; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--ink); cursor: pointer; }
+#ee-form-8 .check-box-field label span { display: block; margin: 0 !important; font-size: 1rem !important; line-height: 1.45 !important; color: var(--ink) !important; }
+#ee-form-8 .check-box-field input[type="checkbox"] { width: 22px; height: 22px; margin: 0 !important; flex: none; accent-color: var(--maroon); }
 #ee-form-8 .ee-form-footer { padding: 6px 0 0 !important; text-align: left !important; }
 #ee-form-8 .btn-submit {
   display: inline-flex; align-items: center; justify-content: center; min-width: 220px; min-height: 54px; padding: .9em 2.2em !important; margin: 0 !important;
@@ -963,6 +978,11 @@ mark.is-marked { background-size: 100% 100%; }
   .ticket__stamp-m { width: 52px; height: 52px; }
   .ticket__stamp-t { font-size: 1.2rem; bottom: 22px; }
   #ee-form-8 .ee-form-body { grid-template-columns: 1fr; }
+  /* captcha box full width (keeps its refresh button), "Enter Text" below it */
+  #ee-form-8 .captchaContainer { grid-template-columns: 1fr; gap: 16px; }
+  /* consent text wraps on phones: the checkbox lines up with its first line */
+  #ee-form-8 .check-box-field label { align-items: flex-start !important; }
+  #ee-form-8 .check-box-field input[type="checkbox"] { margin-top: 2px !important; }
   #ee-form-8 .btn-submit { width: 100%; }
   .ticket .ticket__stamp { top: -24px; right: 2%; width: 116px; height: 116px; }
   .ticket .ticket__stamp-m { width: 42px; height: 42px; }
