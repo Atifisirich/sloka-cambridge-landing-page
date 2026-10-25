@@ -6,7 +6,6 @@
    Swimming: water-ripple shader following the cursor
    Skating: tile glides sideways with scroll velocity
    Art & Music: paint-splash mask reveal
-   Care Club: one line draws a heart, then a hand holding it
    ===================================================================== */
 import { env, clamp, lerp, pointer, whenNear, visibility } from './env.js';
 import { scroll } from './smooth.js';
@@ -18,7 +17,6 @@ export function initBento() {
   initVinyl();
   initGlide();
   initSplash();
-  initCare();
   initOnAir();
   initSlides();
   // WebGL tiles run everywhere; phones get lighter versions driven by taps and scrolling
@@ -174,21 +172,6 @@ function initSplash() {
   ScrollTrigger.create({
     trigger: box, start: 'top 75%', once: true,
     onEnter: () => gsap.to(st, { p: 1, duration: 1.6, ease: 'power2.out', onUpdate: () => paint(st.p), onComplete: () => box.style.setProperty('--splash', 'none') })
-  });
-}
-
-/* ---------- Care Club: one line, a heart, then a hand ---------- */
-function initCare() {
-  const heart = document.querySelector('.care__heart');
-  const hand = document.querySelector('.care__hand');
-  if (!heart || env.reduced) return;
-  [heart, hand].forEach((p) => { const l = p.getTotalLength(); p.style.strokeDasharray = l; p.style.strokeDashoffset = l; });
-  ScrollTrigger.create({
-    trigger: heart.closest('.tile'), start: 'top 75%', once: true,
-    onEnter: () => gsap.timeline()
-      .to(heart, { strokeDashoffset: 0, duration: 2.2, ease: 'power1.inOut' })
-      .to(hand, { strokeDashoffset: 0, duration: 2.4, ease: 'power1.inOut' }, '-=0.3')
-      .to(heart, { scale: 1.06, transformOrigin: '50% 60%', duration: 0.5, yoyo: true, repeat: 3, ease: 'sine.inOut' })
   });
 }
 

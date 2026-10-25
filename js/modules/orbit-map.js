@@ -208,3 +208,17 @@ export function initOrbitMap() {
     }
   });
 }
+
+/* Google Map embed: a light cover sits over it so scrolling (wheel or swipe)
+   always moves the page, never gets swallowed by the map. Click/tap the map
+   to use it; it lets go when the pointer leaves or you tap elsewhere. */
+export function initMapEmbed() {
+  const map = document.querySelector('.location__map');
+  const cover = map?.querySelector('.location__map-cover');
+  if (!cover) return;
+  if (env.touch) cover.querySelector('span').textContent = 'Tap to use the map';
+  const live = (on) => map.classList.toggle('is-live', on);
+  cover.addEventListener('click', () => live(true));
+  map.addEventListener('mouseleave', () => live(false));
+  document.addEventListener('pointerdown', (e) => { if (!map.contains(e.target)) live(false); }, { passive: true });
+}

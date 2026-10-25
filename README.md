@@ -17,7 +17,7 @@ Open http://localhost:5173. ES modules need a server; opening `index.html` from 
 | What | Where |
 |---|---|
 | Logo | Done. `assets/brand/sloka-logo.png` (640px web copy) and `sloka-logo-original.png` (full size). Only the black JPEG corners outside the pill were made transparent |
-| Cambridge logo | Done. `assets/brand/cambridge-international-school-*.webp` (original kept as PNG), shown unaltered on a white plate in the hero, pathway, curriculum card and footer |
+| Cambridge logo | Done. `assets/brand/cambridge-international-school-*.webp` (original kept as PNG), shown unaltered on a white plate in the hero and pathway |
 | Cambridge Fit link | Done: `js/config.js` → `CAMBRIDGE_FIT_URL` (Google Form, used by all 4 compass buttons) |
 | Phone, WhatsApp, email, address, socials | Done, from slokainternational.com/contact-us (Manneguda campus). Edit in `js/config.js` → `SLOKA_SITE` and the JSON-LD block in `index.html` |
 | CRM | Done: ExtraaEdge widget (see below) |
@@ -59,7 +59,7 @@ js/modules/
   smooth.js             Lenis + GSAP ticker, scroll velocity, anchors
   motion.js             colour morph, text and mask reveals, velocity skew, header, footer
   loader.js  spark.js  hero.js  compass.js  seven.js  approach.js
-  pathway.js results.js voice.js bento.js compare.js prism.js letter.js
+  pathway.js results.js voice.js bento.js reasons.js prism.js letter.js
   stories.js orbit-map.js
   gl.js                 ~2 KB WebGL helper (hero breathing, swim ripple, particles)
 scripts/serve.mjs       local static server

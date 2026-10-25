@@ -16,11 +16,11 @@ import { initPathway } from './modules/pathway.js';
 import { initResults } from './modules/results.js';
 import { initVoice } from './modules/voice.js';
 import { initBento } from './modules/bento.js';
-import { initCompare } from './modules/compare.js';
+import { initReasons } from './modules/reasons.js';
 import { initPrism } from './modules/prism.js';
 import { initLetter } from './modules/letter.js';
 import { initStories } from './modules/stories.js';
-import { initOrbitMap } from './modules/orbit-map.js';
+import { initOrbitMap, initMapEmbed } from './modules/orbit-map.js';
 import { initBgMorph, initTextReveals, initImageReveals, initSkew, initChrome, initFooter } from './modules/motion.js';
 
 const root = document.documentElement;
@@ -78,10 +78,10 @@ if (!env.hasLibs) {
     const steps = [
       initSeven, initApproach,
       initPathway,          // pin #1
-      initResults, initVoice, initBento, initCompare,
+      initResults, initVoice, initBento, initReasons,
       initPrism,            // pin #2
       initLetter,           // pin #3 (laptops/desktops)
-      initStories, initOrbitMap, initImageReveals, initSkew, initChrome, initFooter
+      initStories, initOrbitMap, initMapEmbed, initImageReveals, initSkew, initChrome, initFooter
     ];
     for (const step of steps) {
       step();

@@ -15,14 +15,14 @@ window.SLOKA_SITE = {
   PHONE2_E164: '+919640669989',
   WHATSAPP_NUMBER: '919640334460', // the number the school's own WhatsApp button uses
   WHATSAPP_TEXT: 'Hello Sloka Manneguda, I just sent an admission enquiry and would like to know more.',
-  EMAIL: 'admission@slokainternational.com',   // admissions
+  EMAIL: 'admissions@slokainternational.com',  // admissions
   EMAIL2: 'info@slokainternational.com',       // general
   ADDRESS: 'Exit 12 Sports, Turkayamjal Rd, opp. RTA Office, Manneguda, Telangana 501510',
   OFFICE_HOURS: 'Office: 8:30 AM – 5:00 PM · School: Mon–Sat, 8:30 AM – 3:30 PM',
   DIRECTIONS_URL: 'https://www.google.com/maps/dir/?api=1&destination=Sloka+International+School+Turkayamjal+Rd+Manneguda+Telangana+501510',
 
   SOCIAL: {
-    instagram: 'https://www.instagram.com/slokainternationalschool/',
+    instagram: 'https://www.instagram.com/sloka_cambridge/',
     facebook: 'https://www.facebook.com/slokaInternationalschoolhyderabad/',
     youtube: 'https://www.youtube.com/channel/UCkjdzOBYB6-ApScJNpQnKxQ',
     x: 'https://twitter.com/slokaschool'

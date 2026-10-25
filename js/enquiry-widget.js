@@ -3,7 +3,7 @@
    The widget itself (fields, validation, submission) belongs to the CRM
    vendor and is never modified here. This file only:
    1. Starts the widget manually if their loader didn't (safety net, once).
-   2. Keeps smooth scrolling off the widget's own pop-ups.
+   2. Keeps smooth scrolling off the widget's own pop-ups and option lists.
    3. Detects a REAL successful submission (the widget's success pop-up,
       ".ee-form-widget-feedback.success"; errors use ".failure") and then
       plays the ticket's RECEIVED stamp and pushes conversion events.
@@ -41,12 +41,14 @@
   const handled = new WeakSet();
   function check(node) {
     if (node.nodeType !== 1) return;
-    const sel = '.ee-form-widget, .select2-container';
+    const sel = '.ee-form-widget, .select2-container, .select2-results__options, .iti__country-list';
     const found = node.matches(sel) ? [node] : [];
     node.querySelectorAll && found.push(...node.querySelectorAll(sel));
     found.forEach((el) => {
-      // the widget opens its pop-up and dropdown lists outside our container: keep Lenis off them
-      if (!box.contains(el)) el.setAttribute('data-lenis-prevent', '');
+      // Lenis stays off only what really scrolls on its own: the pop-ups the widget
+      // opens outside our container, and its option lists (country codes, dropdowns).
+      // The form itself scrolls with the page, so the glide never breaks at its edge.
+      if (!box.contains(el) || el.matches('.select2-results__options, .iti__country-list')) el.setAttribute('data-lenis-prevent', '');
       if (el.matches('.ee-form-widget-feedback.success') && !handled.has(el)) {
         handled.add(el);
         onSuccess();
@@ -55,6 +57,7 @@
   }
   new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach(check)))
     .observe(document.body, { childList: true, subtree: true });
+  check(box); // in case the widget rendered before this script ran
 
   function onSuccess() {
     // conversion events: real success only

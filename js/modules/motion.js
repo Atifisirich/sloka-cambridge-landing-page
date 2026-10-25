@@ -137,6 +137,9 @@ export function initChrome() {
   const header = document.querySelector('.site-header');
   const bar = document.querySelector('.mobile-bar');
   const hero = document.querySelector('.hero');
+  // Laptops/tablets: the header (and its Enquire button) always stays on screen.
+  // Phones: it tucks away on scroll-down, because the bottom bar carries Enquire.
+  const tucks = matchMedia('(max-width: 899px)');
   let lastY = scrollY;
   ScrollTrigger.create({
     start: 0, end: 'max',
@@ -144,7 +147,7 @@ export function initChrome() {
       const y = scrollY;
       const pastHero = y > hero.offsetHeight - 80;
       header.classList.toggle('is-solid', pastHero && !isOverDark(header));
-      header.classList.toggle('is-hidden', pastHero && y > lastY + 2);
+      header.classList.toggle('is-hidden', tucks.matches && pastHero && y > lastY + 2);
       if (y < lastY - 2) header.classList.remove('is-hidden');
       lastY = y;
     }
@@ -155,15 +158,12 @@ export function initChrome() {
     return el ? el.dataset.bg === 'maroon' : false;
   }
 
-  // Hide the sticky "Enquire Now" bar when the form or footer is on screen
-  if (bar) {
-    const targets = [document.getElementById('enquiry-form'), document.querySelector('.footer')];
-    const seen = new Set();
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)));
-      bar.classList.toggle('is-hidden', seen.size > 0);
-    }, { threshold: 0.15 });
-    targets.forEach((t) => t && io.observe(t));
+  // The sticky "Enquire Now" bar stays on screen all the way down, and only
+  // steps aside while the form itself is on screen (it would cover the fields)
+  const form = document.querySelector('.ticket') || document.getElementById('enquiry-form');
+  if (bar && form) {
+    const io = new IntersectionObserver(([e]) => bar.classList.toggle('is-hidden', e.isIntersecting), { threshold: 0.15 });
+    io.observe(form);
   }
 }
 

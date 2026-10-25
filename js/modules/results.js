@@ -1,6 +1,6 @@
 /* =====================================================================
    Results: 12 yellow A* medallions and 24 maroon A tiles fall into a pit
-   (Matter.js). Grab, throw and stack them; a counter ticks as they land.
+   (Matter.js). Grab, throw and stack them.
    Tap the pile to make tokens jump. Phones: drag and flick with a finger
    (empty space still scrolls the page) and tilt the phone to tip the pile.
    Fallback (reduced motion / no Matter): a neat stacked grid.
@@ -14,17 +14,14 @@ const MATTER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matt
 export function initResults() {
   const section = document.querySelector('.results');
   const pit = section.querySelector('[data-physics]');
-  const counter = section.querySelector('[data-count-total]');
 
   if (env.reduced) { fallbackGrid(section, pit); return; }
 
-  counter.textContent = '0';
   whenNear(pit, async () => {
     try {
       await loadScript(MATTER_SRC);
-      ScrollTrigger.create({ trigger: pit, start: 'top 75%', once: true, onEnter: () => startPhysics(pit, counter) });
+      ScrollTrigger.create({ trigger: pit, start: 'top 75%', once: true, onEnter: () => startPhysics(pit) });
     } catch (e) {
-      counter.textContent = String(STARS + AS);
       fallbackGrid(section, pit);
     }
   }, '600px');
@@ -67,7 +64,7 @@ function sprite(size, draw) {
   return c;
 }
 
-function startPhysics(pit, counter) {
+function startPhysics(pit) {
   const { Engine, Bodies, Composite, Mouse, MouseConstraint, Events, Body, Constraint, Query } = window.Matter;
   const canvas = pit.querySelector('.results__canvas');
   const ctx = canvas.getContext('2d');
@@ -137,7 +134,6 @@ function startPhysics(pit, counter) {
         if (other.label === 'ground' || other.landed) {
           t.landed = true;
           landed++;
-          counter.textContent = landed;
           if (landed === STARS + AS) spark.bloom(1.5);
         }
       });
